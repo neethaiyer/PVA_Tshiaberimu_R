@@ -1,5 +1,6 @@
 ## Set the working directory:
-workingDir <- "~/Box Sync/PVA_Paper/Draft6_PVA_R/"
+#workingDir <- "~/Box Sync/PVA_Paper/Draft6_PVA_R/"
+workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
 #####################################################################################
 ############ PART 1: Historical population trends for Tshiaberimu gorillas ##########
@@ -43,7 +44,7 @@ lines(numyears, popEst_lm, col=2, lty=2, lwd=2)
 
 dat <- read.csv(paste0(workingDir, "Breuer_western gorilla life table.csv"))
 
-## Data from Bronikowski et al (2016) for moutain gorillas (MTN)
+## Data from Bronikowski et al (2016) for mountain gorillas (MTN)
 ## Note the first age of reproduction is 8 years although the first birth is usually at 10 years old for mountain gorillas and the fertility rate varied for each adult year.
 dat1 <- read.csv(paste0(workingDir, "Bronikowski_Eastern female gorilla life table.csv"))
 
@@ -66,8 +67,8 @@ head(mat_mtn) ## View and check matrix
 ## Calculate the eigenvalue of the matrices
 eigenvalues_wlg <- eigen(mat, only.values=TRUE)
 eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
-eigenvalues_wlg$values[1] ## this is the dominant eigenvalue of the WLG LM, i.e. lambda = 1.020623
-eigenvalues_mtn$values[1] ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.032567
+Re(eigenvalues_wlg$values[1]) ## this is the dominant eigenvalue of the WLG LM, i.e. lambda = 1.020623
+Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.032567
 
 ## Let's create a demographic pyramid for WLG
 n <- rep(1, nrow(dat))
@@ -78,7 +79,6 @@ for (i in 2:length(n)){
 }
 ## Make sure sum equals 1 to generate pyramid
 n <- n/(sum(n))
-n1 <- n/n[1]
 
 ## Let's create a demographic pyramid for MTN
 n_mtn <- rep(1, nrow(dat1))
@@ -89,21 +89,21 @@ for (i in 2:length(n_mtn)){
 }
 ## Make sure sum equals 1 to generate pyramid
 n_mtn <- n_mtn/(sum(n_mtn))
-n_mtn_1 <- n_mtn/n_mtn[1]
 
 ## Let's pick our colors for MTN and WLG and include a transparency factor; note that these are only used for the bargraph below:
 salmon <- rgb(250, 128, 114, alpha=150, maxColorValue = 255) ## for WLG
 azure4 <- rgb(131, 139, 139, alpha=150, maxColorValue = 255) ## for MTN
 
-##par(mfrow=c(1,2), oma=c(0,0,0,0), mar=c(5,4,2,1))
+#par(mfrow=c(1,2), oma=c(0,0,0,0), mar=c(5,4,2,1))
 ## demographic pyramid for MTN
-barplot(n_mtn_1, horiz=T, names.arg=paste0(0:(length(n_mtn_1)-1), "-", 1:length(n_mtn_1)), las=1, xlab="relative frequency", col=azure4, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2)
+barplot(n_mtn, horiz=T, names.arg=paste0(0:(length(n_mtn_1)-1), "-", 1:length(n_mtn_1)), las=1, xlab="relative frequency", col=azure4, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, xlim=c(0,0.07))
 
 ## demographic pyramid for WLG
-barplot(n1, horiz=T, names.arg=paste0(0:(length(n1)-1), "-", 1:length(n1)), las=1, xlab="relative frequency", col=salmon, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, add=TRUE)
+barplot(n, horiz=T, names.arg=paste0(0:(length(n1)-1), "-", 1:length(n1)), las=1, xlab="relative frequency", col=salmon, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, add=TRUE)
 
 ## Let's take a look at the annual mortality and cumulative survival curves for MTN and WLG
 ## 2-pannel survival plot
+pdf()##etc
 par(mfrow=c(1,2), oma=c(0,0,0,0), mar=c(5,4,2,1))
 plot(dat[,1:2], type="o", bty="l", xlab="Age", ylab="Annual mortality", las=1, col="salmon", cex.lab=0.8, cex.axis=0.8, ylim=c(0,1), cex=.5, cex.lab=0.8, font.lab=2, pch=16)
 lines(dat1[,1:2], type="o", bty="l", xlab="Age", ylab="Annual mortality", las=1, col="azure4", cex.lab=0.8, cex.axis=0.8, ylim=c(0,1), cex=.5, cex.lab=0.8, font.lab=2, pch=4)
@@ -119,20 +119,20 @@ legend(15, 1, legend=c("Western Gorillas", "Mountain Gorillas"),
 ################################ LM Parameter Specification ################################
 ############################################################################################
 
-## The asymptotic growth rate lambda was derived from the Leslie matrix lambda is the dominant eigenvalue of LM
+## The asymptotic growth rate lambda was derived from the Leslie matrix (LM). Lambda is the dominant eigenvalue of LM
 ## At each 1-year time step, we multiplied the Leslie matrix by the current age-specific population estimates to calculate the expected new age-specific population estimates: Nt+1 = LM * Nt
 ## A stochastic version of this LM model was also created.
 ## Some assumptions were made when using this LM model: 
-## (1) unchanging environment
+## (1) stable environment
 ## (2) age-specific mortality and fertility rates are constant over time
-## (3) population is in the exponential phase (no density dependence)
+## (3) population is in the exponential growth phase (no density dependence)
 ## (4) 1:1 sex ratio at birth
-## (5) only females considered and they are always reproductively active
+## (5) only females considered and adult females are always reproductively active
 
 ## Tshiaberimu Reintroduction Scenarios for simple LM projection
-## The dynamics of the Tshiaberimu population under Scenarios A-F specified above was simulated over a timeframe of 50 years
-## Scenario A: starting population as current Tshiaberimu status: 1 adult female (assuming juvenile is M) / age:19
-## Scenario B: starting population as current Tshiaberimu status: 1 juvenile, 1 adult female (assuming juvenile is F) / age:5,19
+## The dynamics of the Tshiaberimu population under Scenarios A-I specified below was simulated over a timeframe of 50 years
+## Scenario A: starting population as current Tshiaberimu status: 1 adult female aged 19 and assuming juvenile is M
+## Scenario B: starting population as current Tshiaberimu status: 1 adult female aged 19 and assuming juvenile is F and aged 5
 ## Scenario C: starting population 1F plus 2 Fs reintroduced / age:7,7,19
 ## Scenario D: starting population 1F plus 3 Fs reintroduced / age:7,7,8,19
 ## Scenario E: starting population 1F plus 4 Fs reintroduced / age:7,7,8,9,19
@@ -142,36 +142,31 @@ legend(15, 1, legend=c("Western Gorillas", "Mountain Gorillas"),
 ## Scenario I: starting population 1F plus 8 Fs reintroduced / age:7,7,8,9,12,12,17,17,19
   
 ## Notes:
-## 1. Scenarios A & B take into account the uncertainty in sex of the surviving juvenile in the current Tshiaberimu population. Scenarios C-I assume that the juvenile is a male and that the current adult female is 19 years old. 
-## 2. In addition to the deterministic population projections, the mean stochastic population projection and probability of extinction were calculated for 1000 simulations.
+## 1. Scenarios A & B take into account the uncertainty in sex of the surviving juvenile in the current Tshiaberimu population. Scenarios C-I assume that the current adult female is 19 years and conservatively assume that the juvenile is a male.
+## 2. In addition to the deterministic population projections, the mean stochastic population projection and probability of extinction were calculated for 1000 50-year-long simulations.
 ## 3. Probability of extinction for each scenario was calculated as the total proportion of simulations that resulted in a final population size of 0 females. 
 
-## The function is the deterministic LM projection and calculates the final population size using the specified LM, projection period, and the age and number of females in the starting population No. We multiply each projection with the 
-## N projection
+## The function below returns the deterministic LM population size projection, using the projection period (tfinal), age and number of females in the starting population (No) and Leslie matrix (LM). 
 pop_projection <- function(tfinal, LM=mat, No=No){
-  pop <- No
-  N <- NULL
-  N <- cbind(N,pop)
+  pop <- N <- No
   for (i in 1:tfinal){
-    pop <- mat%*%pop
+    pop <- LM%*%pop
     N <- cbind(N,pop)
   }
   N
 }
 
+## The function below returns the stochastic LM population size projection, using the projection period (tfinal), age and number of females in the starting population (No) and Leslie matrix (LM). 
 stoch_projection <- function(tfinal, LM=mat, No=No){
-  ##stochastic model
-  N <- No
-  Nf <- sum(N)
+  pop <- N <- No
   for (i in 1:tfinal){
-    N1 <- N
-    for (j in 1:length(N)){ ## j represents the age of gorillas
-      N1[j] <- sum(rbinom(n=N, size=N, prob=mat[j,]))
+  	currentpop <- pop
+    for (j in 1:length(No)){
+      pop[j] <- sum(rbinom(n=length(No), size=currentpop, prob=LM[j,]))
     }
-    N <- N1
-    Nf <- c(Nf, sum(N1))
+    N <- cbind(N, pop)
   }
-  Nf
+  N
 }
 
 ## Now, let's apply the functions using each scenario.
@@ -179,47 +174,47 @@ stoch_projection <- function(tfinal, LM=mat, No=No){
 nyears <- 50 ## projection period
 ## Scenario A: starting population as current Tshiaberimu status: 1 adult female (assuming juvenile is M) / age:19
 No <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N <- pop_projection(tfinal=nyears, No=No) 
+N <- pop_projection(tfinal=nyears, LM=mat, No=No) 
 N_projected_det <- apply(N,2,sum)
 
 ## Scenario B: starting population as current Tshiaberimu status: 1 juvenile, 1 adult female (assuming juvenile is F) / age:5,19
 No_0 <- c(0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N <- pop_projection(tfinal=nyears, No=No_0) 
+N <- pop_projection(tfinal=nyears, LM=mat, No=No_0) 
 N_projected_det0 <- apply(N,2,sum)
 
 ## Scenario C: starting population 1F plus 2 Fs reintroduced / age:7,7,19
 No_2 <- c(0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N2 <- pop_projection(tfinal=nyears, No=No_2)
+N2 <- pop_projection(tfinal=nyears, LM=mat, No=No_2)
 N_projected_det2 <- apply(N2,2,sum)
 
 ## Scenario D: starting population 1F plus 3 Fs reintroduced / age:7,7,8,19
 No_3 <- c(0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N3 <- pop_projection(tfinal=nyears, No=No_3)
+N3 <- pop_projection(tfinal=nyears, LM=mat, No=No_3)
 N_projected_det3 <- apply(N3,2,sum)
 
 ## Scenario E: starting population 1F plus 4 Fs reintroduced / age:7,7,8,9,19
 No_4 <- c(0,0,0,0,0,0,0,2,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N4 <- pop_projection(tfinal=nyears, No=No_4)
+N4 <- pop_projection(tfinal=nyears, LM=mat, No=No_4)
 N_projected_det4 <- apply(N4,2,sum)
 
 ## Scenario F: starting population 1F plus 5 Fs reintroduced / age:7,7,8,9,12,19
 No_5 <- c(0,0,0,0,0,0,0,2,1,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N5 <- pop_projection(tfinal=nyears, No=No_5)
+N5 <- pop_projection(tfinal=nyears, LM=mat, No=No_5)
 N_projected_det5 <- apply(N5,2,sum)
 
 ## Scenario G: starting population 1F plus 6 Fs reintroduced / age:7,7,8,9,12,12,19
 No_6 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N6 <- pop_projection(tfinal=nyears, No=No_6)
+N6 <- pop_projection(tfinal=nyears, LM=mat, No=No_6)
 N_projected_det6 <- apply(N6,2,sum)
 
 ## Scenario H: starting population 1F plus 7 Fs reintroduced / age:7,7,8,9,12,12,17,19
 No_7 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N7 <- pop_projection(tfinal=nyears, No=No_7)
+N7 <- pop_projection(tfinal=nyears, LM=mat, No=No_7)
 N_projected_det7 <- apply(N7,2,sum)
 
 ## Scenario I: starting population 1F plus 8 Fs reintroduced / age:7,7,8,9,12,12,17,17,19
 No_8 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N8 <- pop_projection(tfinal=nyears, No=No_8)
+N8 <- pop_projection(tfinal=nyears, LM=mat, No=No_8)
 N_projected_det8 <- apply(N8,2,sum)
 
 ## Second, let's use the stochastic function: 
@@ -237,7 +232,7 @@ temp8 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
 
 ## run each scenario 1000 times using the stochastic projection
 for(i in 1:nruns) {
-  N_projected_stoch <- stoch_projection(tfinal=nyears, No=No)
+  N_projected_stoch <- apply(stoch_projection(tfinal=nyears, No=No),2,sum)
   N_projected_stoch0 <- stoch_projection(tfinal=nyears, No=No_0)
   N_projected_stoch2 <- stoch_projection(tfinal=nyears, No=No_2)
   N_projected_stoch3 <- stoch_projection(tfinal=nyears, No=No_3)
