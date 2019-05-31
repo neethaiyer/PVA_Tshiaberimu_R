@@ -226,23 +226,21 @@ temp <- temp0 <- temp2 <- temp3 <- temp4 <- temp5 <- temp6 <- temp7 <- temp8 <- 
 
 ## run each scenario 1000 times using the stochastic projection
 for(i in 1:nruns) {
-  temp[1:length(N_projected_stoch),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum)
-  temp0[1:length(N_projected_stoch0),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_0),2,sum)
-  temp2[1:length(N_projected_stoch2),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_2),2,sum)
-  temp3[1:length(N_projected_stoch3),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_3),2,sum)
-  temp4[1:length(N_projected_stoch4),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_4),2,sum)
-  temp5[1:length(N_projected_stoch5),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_5),2,sum)
-  temp6[1:length(N_projected_stoch6),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_6),2,sum)
-  temp7[1:length(N_projected_stoch7),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_7),2,sum)
-  temp8[1:length(N_projected_stoch8),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_8),2,sum)
+  temp[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum)
+  temp0[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_0),2,sum)
+  temp2[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_2),2,sum)
+  temp3[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_3),2,sum)
+  temp4[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_4),2,sum)
+  temp5[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_5),2,sum)
+  temp6[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_6),2,sum)
+  temp7[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_7),2,sum)
+  temp8[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_8),2,sum)
 }
 
 ## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
-
-
 prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]), 
-                           probability_150 =  NA, 
-                           probability_100 = NA, 
+                           prob_150 =  NA, 
+                           prob_100 = NA, 
                            prob_50 = NA, 
                            prob_40 = NA, 
                            prob_Extn = NA)
@@ -300,15 +298,16 @@ legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas"),
 
 ## Make sure you choose the right LM for either MTN or WLG at the start of this section before you plot the graphs below:
 
+#######################################################
+############## PLOT FOR Scenarios A to I ##############
+#######################################################
+
+simObjects <- c("temp", "temp0", "temp2", "temp3", "temp4", "temp5", "temp6", "temp7", "temp8")
+detObjects <- c("N_projected_det", "N_projected_det0", "N_projected_det2", "N_projected_det3", "N_projected_det4", "N_projected_det5", "N_projected_det6", "N_projected_det7", "N_projected_det8")
+
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
 time <- 0:50 ## time interval for the plots
-
-#################################################
-############## PLOT FOR Scenarios A to I ##############
-#################################################
-simObjects <- c("temp", "temp0", "temp2", "temp3", "temp4", "temp5", "temp6", "temp7", "temp8")
-detObjects <- c("N_projected_det", "N_projected_det0", "N_projected_det2", "N_projected_det3", "N_projected_det4", "N_projected_det5", "N_projected_det6", "N_projected_det7", "N_projected_det8")
 
 for(j in 1:9){
 probExt <- prob_50years_wlg_lm[j,6]
