@@ -147,7 +147,7 @@ legend(15, 1, legend=c("Western Gorillas", "Mountain Gorillas"),
 ## 3. Probability of extinction for each scenario was calculated as the total proportion of simulations that resulted in a final population size of 0 females. 
 
 ## The function below returns the deterministic LM population size projection, using the projection period (tfinal), age and number of females in the starting population (No) and Leslie matrix (LM). 
-mat <- mat_mtn ## make sure you choose either the WLG or MTN LM (mat or mat_mtn respectively)
+mat <- mat_wlg ## make sure you choose either the WLG or MTN LM (mat or mat_mtn respectively)
 #mat <- mat_wlg
 pop_projection <- function(tfinal, LM=mat, No=No){
   pop <- N <- No
@@ -171,70 +171,90 @@ stoch_projection <- function(tfinal, LM=mat, No=No){
   N
 }
 
-## Now, let's apply the functions using each scenario.
+## Now, let's apply the functions using each reintrodcution scenario. Load the appropriate csv file.
+ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv"))
 ## First, let's use the deterministic function:
+
+#### NEETHA WORK ON THIS FUNCTION FOR LOOPING THROUGH BELOW:
+
+nyears <- 50 ## projection period
+function (reintroscenario){
+  No_i <- ReintroScenario$No_i
+  N_i <- pop_projection(tfinal=nyears, LM=mat, No=No_i) 
+  N_projected_deti <- apply(N_i,2,sum)
+}
+
+for(i in c("ReintroScenario$No_A", "ReintroScenario$No_B", "ReintroScenario$No_C", "ReintroScenario$No_D", "ReintroScenario$No_E", "ReintroScenario$No_F", "ReintroScenario$No_G", "ReintroScenario$No_H", "ReintroScenario$No_I")){
+  ReintroScenario$No_X <- get(i)
+  No_i <- get(i)
+  N_i <- get(i)
+  N_projected_deti <- get(i)
+  ## Apply the deterministic projection to all scenarios
+ 
+}
+
 nyears <- 50 ## projection period
 ## Scenario A: starting population as current Tshiaberimu status: 1 adult female (assuming juvenile is M) / age:19
-No <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N <- pop_projection(tfinal=nyears, LM=mat, No=No) 
-N_projected_det <- apply(N,2,sum)
+No_A <- ReintroScenario$No_A
+N_A <- pop_projection(tfinal=nyears, LM=mat, No=No_A) 
+N_projected_detA <- apply(N_A,2,sum)
 
 ## Scenario B: starting population as current Tshiaberimu status: 1 juvenile, 1 adult female (assuming juvenile is F) / age:5,19
-No_0 <- c(0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N <- pop_projection(tfinal=nyears, LM=mat, No=No_0) 
-N_projected_det0 <- apply(N,2,sum)
+No_B <- ReintroScenario$No_B
+N_B <- pop_projection(tfinal=nyears, LM=mat, No=No_B) 
+N_projected_detB <- apply(N_B,2,sum)
 
 ## Scenario C: starting population 1F plus 2 Fs reintroduced / age:7,7,19
-No_2 <- c(0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N2 <- pop_projection(tfinal=nyears, LM=mat, No=No_2)
-N_projected_det2 <- apply(N2,2,sum)
+No_C <- ReintroScenario$No_C
+N_C <- pop_projection(tfinal=nyears, LM=mat, No=No_C)
+N_projected_detC <- apply(N_C,2,sum)
 
 ## Scenario D: starting population 1F plus 3 Fs reintroduced / age:7,7,8,19
-No_3 <- c(0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N3 <- pop_projection(tfinal=nyears, LM=mat, No=No_3)
-N_projected_det3 <- apply(N3,2,sum)
+No_D <- ReintroScenario$No_D
+N_D <- pop_projection(tfinal=nyears, LM=mat, No=No_D)
+N_projected_detD <- apply(N_D,2,sum)
 
 ## Scenario E: starting population 1F plus 4 Fs reintroduced / age:7,7,8,9,19
-No_4 <- c(0,0,0,0,0,0,0,2,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N4 <- pop_projection(tfinal=nyears, LM=mat, No=No_4)
-N_projected_det4 <- apply(N4,2,sum)
+No_E <- ReintroScenario$No_E
+N_E <- pop_projection(tfinal=nyears, LM=mat, No=No_E)
+N_projected_detE <- apply(N_E,2,sum)
 
 ## Scenario F: starting population 1F plus 5 Fs reintroduced / age:7,7,8,9,12,19
-No_5 <- c(0,0,0,0,0,0,0,2,1,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N5 <- pop_projection(tfinal=nyears, LM=mat, No=No_5)
-N_projected_det5 <- apply(N5,2,sum)
+No_F <- ReintroScenario$No_F
+N_F <- pop_projection(tfinal=nyears, LM=mat, No=No_F)
+N_projected_detF <- apply(N_F,2,sum)
 
 ## Scenario G: starting population 1F plus 6 Fs reintroduced / age:7,7,8,9,12,12,19
-No_6 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N6 <- pop_projection(tfinal=nyears, LM=mat, No=No_6)
-N_projected_det6 <- apply(N6,2,sum)
+No_G <- ReintroScenario$No_G
+N_G <- pop_projection(tfinal=nyears, LM=mat, No=No_G)
+N_projected_detG <- apply(N_G,2,sum)
 
 ## Scenario H: starting population 1F plus 7 Fs reintroduced / age:7,7,8,9,12,12,17,19
-No_7 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N7 <- pop_projection(tfinal=nyears, LM=mat, No=No_7)
-N_projected_det7 <- apply(N7,2,sum)
+No_H <- ReintroScenario$No_H
+N_H <- pop_projection(tfinal=nyears, LM=mat, No=No_H)
+N_projected_detH <- apply(N_H,2,sum)
 
 ## Scenario I: starting population 1F plus 8 Fs reintroduced / age:7,7,8,9,12,12,17,17,19
-No_8 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N8 <- pop_projection(tfinal=nyears, LM=mat, No=No_8)
-N_projected_det8 <- apply(N8,2,sum)
+No_I <- ReintroScenario$No_I
+N_I <- pop_projection(tfinal=nyears, LM=mat, No=No_I)
+N_projected_detI <- apply(N_I,2,sum)
 
 ## Second, let's use the stochastic function: 
 nruns <- 1000 ## number of simulations of the model
 ## The temp vectors are empty matrices that will save the number of individuals for each year of the projection for each run of the projection 
-temp <- temp0 <- temp2 <- temp3 <- temp4 <- temp5 <- temp6 <- temp7 <- temp8 <- matrix(0, nrow=nyears+1, ncol=nruns)
+tempA <- tempB <- tempC <- tempD <- tempE <- tempF <- tempG <- tempH <- tempI <- matrix(0, nrow=nyears+1, ncol=nruns)
 
 ## run each scenario 1000 times using the stochastic projection
 for(i in 1:nruns) {
-  temp[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum)
-  temp0[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_0),2,sum)
-  temp2[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_2),2,sum)
-  temp3[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_3),2,sum)
-  temp4[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_4),2,sum)
-  temp5[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_5),2,sum)
-  temp6[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_6),2,sum)
-  temp7[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_7),2,sum)
-  temp8[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_8),2,sum)
+  tempA[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_A),2,sum)
+  tempB[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_B),2,sum)
+  tempC[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_C),2,sum)
+  tempD[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_D),2,sum)
+  tempE[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_E),2,sum)
+  tempF[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_F),2,sum)
+  tempG[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_G),2,sum)
+  tempH[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_H),2,sum)
+  tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_I),2,sum)
 }
 
 ## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
@@ -291,7 +311,6 @@ lines(prob_50years_mtn_lm$scenario, prob_50years_mtn_lm$prob_Extn, bg="azure4", 
 legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas"),
        pt.bg=c("coral", "azure4"), lty=c(1,1), text.font=2, pch=c(21,24))
 
-
 ################################################################################################
 ########################### Plots of 1000 simulations for each Scenario ########################
 ################################################################################################
@@ -302,8 +321,8 @@ legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas"),
 ############## PLOT FOR Scenarios A to I ##############
 #######################################################
 
-simObjects <- c("temp", "temp0", "temp2", "temp3", "temp4", "temp5", "temp6", "temp7", "temp8")
-detObjects <- c("N_projected_det", "N_projected_det0", "N_projected_det2", "N_projected_det3", "N_projected_det4", "N_projected_det5", "N_projected_det6", "N_projected_det7", "N_projected_det8")
+simObjects <- c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH", "tempI")
+detObjects <- c("N_projected_detA", "N_projected_detB", "N_projected_detC", "N_projected_detD", "N_projected_detE", "N_projected_detF", "N_projected_detG", "N_projected_detH", "N_projected_detI")
 
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
@@ -331,33 +350,36 @@ lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for
 ############################ PART 3: Individual-based model (IBM) ############################
 ########################################################################################
 
-## We specified 5 categories of individuals: 
-## infant (I), weaned immature female, cycling adult female (C), pregnant adult female (P), lactating adult female (L), and females that lose their infants (CD)
+## For this model, we specified 5 categories of individuals: 
+## immature (I): either weaned juveniles or unweaned infants, cycling adult female (C), pregnant adult female (P), lactating adult female (L), and females that lose their infants (CD)
 ## Thus, our IBM will inclde both an age and reproductive status category vector. See STEPS 1-2 below.
+## Make sure to choose between either A. MTN or B. WLG for the steps below. 
 
 ########################################################################################
 ######################## STEP 1: AGE CATEGORIES FOR INDIVIDUALS ########################
 ########################################################################################
 
-ages0 <- numeric(0)
-ages0 <- rep(1:length(n), rmultinom(1,100,prob=n))##we start with 100 individuals
+ages0 <- numeric(0) ## we need a vector that keeps track of the age of individuals
+ages0 <- rep(1:length(n), rmultinom(1,100,prob=n)) ## We start with 100 individuals. rmultinom creates a vector that assigns the number of individuals (in this case 100) to each age, according to the LM demography
 hist(ages0)
 
-## A. Parameters for MTN (optimistic model)
+## A. Parameters for optimistic model (MTN)
 ## Set up a variable that keeps track of the time since entry into the current age category
 time0 <- numeric(length(ages0))
-## given an individual's age0 at time0, how many years has it been since entering the current age category?
-time0[(ages0-3.5)>=0 & (ages0-3.5)<2.5] <- ages0[(ages0-3.5)>=0 & (ages0-3.5)<2.5]-3.5 
-time0[(ages0-6)>=0 & (ages0-6)<2] <- ages0[(ages0-6)>=0 & (ages0-6)<2]-6
-time0[(ages0-8)>=0] <- 0
-time0 <- time0[ages0>=3.5]
+
+## Given an individual's age0 at time0, how many years has it been since entering the current age category?
+time0[(ages0-3.5)>=0 & (ages0-3.5)<2.5] <- ages0[(ages0-3.5)>=0 & (ages0-3.5)<2.5]-3.5 ## time since entry into unweaned category: all immatures that are between 0-3.5 years old that have been in this category for less than 2.5 years
+time0[(ages0-6)>=0 & (ages0-6)<2] <- ages0[(ages0-6)>=0 & (ages0-6)<2]-6 ## time since entry into weaned category: all immatures that are between 0-8 years old that have been in this category for less than 2 years
+time0[(ages0-8)>=0] <- 0 ## time since entry into adult category: all individuals that are older than 8 years of age now enter the C category
+time0 <- time0[ages0>=3.5] ## all unweaned individuals under 3.5 years old are not included in the model, and are modeled along with the mothers, until they are weaned.  
 ages0 <- ages0[ages0>=3.5]
 
-## B. Parameters for WLG (conservative model)
+## B. Parameters for conservative model (WLG)
 ## Set up a variable that keeps track of the time since entry into the current age category
 time0 <- numeric(length(ages0))
-## given an individual's age0 at time0, how many years has it been since entering the current age category? 
-time0[(ages0-4.5)>=0 & (ages0-4.5)<1.5] <- ages0[(ages0-4.5)>=0 & (ages0-4.5)<4]-4.5 
+
+## Given an individual's age0 at time0, how many years has it been since entering the current age category? 
+time0[(ages0-4.5)>=0 & (ages0-4.5)<1.5] <- ages0[(ages0-4.5)>=0 & (ages0-4.5)<1.5]-4.5 
 time0[(ages0-8)>=0 & (ages0-8)<2] <- ages0[(ages0-8)>=0 & (ages0-8)<2]-8
 time0[(ages0-10)>=0] <- 0
 time0 <- time0[ages0>=4.5]
@@ -369,14 +391,14 @@ ages0 <- ages0[ages0>=4.5]
 
 ## A. Adult female status (MTN)
 status0 <- character(length(ages0))
-status0[ages0<8] <- "I"
-status0[ages0>=8] <- "C" ## We start the simulation with cycling females only
+status0[ages0<8] <- "I" ## Immature individuals are those between 0-8 years old and non-reproductive
+status0[ages0>=8] <- "C" ## We start the simulation with cycling females only. With each timestep in the model, C females may transition to other categories, detailed in Step 3
 data.frame(ages0, time0, status0)
 
 ## B. Adult female status (WLG)
 status0 <- character(length(ages0))
-status0[ages0<10] <- "I"
-status0[ages0>=10] <- "C" ## We start the simulation with cycling females only
+status0[ages0<10] <- "I" ## Immature individuals are those between 0-10 years old and non-reproductive
+status0[ages0>=10] <- "C" ## We start the simulation with cycling females only. With each timestep in the model, C females may transition to other categories, detailed in Step 3
 data.frame(ages0, time0, status0)
 
 ## So, there are 3 vectors that we need to update at each time step: ages0, time0, status0 
@@ -385,30 +407,42 @@ data.frame(ages0, time0, status0)
 #################### STEP 3: TRANSITION PROBABILITES OF INDIVIDUALS ####################
 ########################################################################################
 
-## Transition probabilities, in relation to time since entry in current category
+## Next, we specifiy the transition probabilities, in relation to time since entry in the "current" category
 
-datX <- dat
+## A. Initial parameters: survivorship, fertility, and weaning age (MTN)
+datX <- dat ## from the LM loaded in Part 2
 weaningAge <- 4.5
-#datX <- dat1
+
+## B. Initial parameters: survivorship, fertility, and weaning age (WLG)
+#datX <- dat1 ## from the LM loaded in Part 2
 #weaningAge <- 3.5
 
 ## Transition probabilities (MTN or WLG)
 ## t is the time passed in the initial class
-timeunit <- 1/12 ## in years. Each time step is 1 month
+timeunit <- 1/12 ## in years. Each time step is 1 month.
+
+## 1. Transition from I to C:
 IC <- function(t) ifelse(t<8, 0, 1) ## Probability for an immature to transition to adult is zero if t<8 and 1 if t>=8
+
+## 2. Transition from C to P:
 alpha <- .99 ## Probability to be pregnant after 12 months being cycling
-# (1-p)^(1/timeunit)=1-alpha
-# log(1-p)=log(1-alpha)/(1/timeunit)
-# p=1-exp(log(1-alpha)/(1/timeunit))
+## relationship between alpha and p: 
+## (1-p)^(1/timeunit)=1-alpha
+## log(1-p)=log(1-alpha)/(1/timeunit)
+## p=1-exp(log(1-alpha)/(1/timeunit))
 CP <- function(t, alpha) 1-exp(log(1-alpha)/(1/timeunit)) ## Probability for a cycling adult female to become pregnant, per time step, given the alpha value
-PL <- function(t) ifelse(t<8.5/12, 0, 1) ## Probability for a pregnant adult female to transition to "lactating" is 1 if she's been pregnant for 8.5 months
-LCdeathInf <- function(t) 1-exp(log(1-datX[trunc(t+1),2])/(1/timeunit))  ##probability that a lactating female becomes "cycling" due to the loss of her dependent infant
-LC <- function(t) ifelse(t<weaningAge,0,1) ## Weaning
-deathRate <- function(age) 1-exp(log(1-datX[trunc(age+1),2])/(1/timeunit)) ## death rate, per month
 
+## 3. Transition from P to L:
+PL <- function(t) ifelse(t<8.5/12, 0, 1) ## Probability for a pregnant adult female to transition to "lactating" is 1 if she has been pregnant for 8.5 months
 
-## I,C,P,L,CD
-## Change in status of each agent in model
+## 4. Transition from L to C: (due to infant death)
+LCdeathInf <- function(t) 1-exp(log(1-datX[trunc(t+1),2])/(1/timeunit))  ## Probability that a lactating female transitions to cycling due to the loss of her dependent infant
+LC <- function(t) ifelse(t<weaningAge,0,1) ## Probability that a lactating female transitions to cycling is 1 after the weaning age of her infant.
+
+## 5. Mortality rate
+deathRate <- function(age) 1-exp(log(1-datX[trunc(age+1),2])/(1/timeunit)) ## Death rate, per month, specified by the LM
+
+## Function that specifies the status change of each agent in model : I,C,P,L,CD
 statusChange <- function(value, t, alpha){
   if(value=="I"){
     if(rbinom(1,1,IC(t))){
@@ -422,16 +456,17 @@ statusChange <- function(value, t, alpha){
     if(rbinom(1,1,PL(t))){
       return("L")
     } else return('P')
-  } else if(!rbinom(1,1,LC(t))){		##if infant doesn't get weaned because it's too young
-    if(!rbinom(1,1,LCdeathInf(t))) {	##if infant doesn't die
-      return("L")						##still lactating
-    } else return("CD")					##if infant dies, female becomes "CD", ie she's back cycling after the death of her infant
+  } else if(!rbinom(1,1,LC(t))){		  ## If her infant doesn't get weaned because it is too young
+    if(!rbinom(1,1,LCdeathInf(t))) {	## If her infant doesn't die
+      return("L")						          ## Then the female is still lactating
+    } else return("CD")					      ## If her infant dies, female becomes "CD", i.e. she transitions to cycling after the death of her infant
   } else  return("C")
 }
 
 ## Possible statuses: I,C,P,L,CD
-# statusChange("L", 0.6, 0.99)
-# statusChange("C", 3/12, 0.99)
+## quick test:
+## statusChange("L", 0.6, 0.99)
+## statusChange("C", 3/12, 0.99)
 
 ########################################################################################
 #################### STEP 4: SIMULATION FUNCTION FOR STOCHASTIC IBM ####################
@@ -477,7 +512,7 @@ simTshia <- function(ages0 = c(5), status0 =c("I"), time0 = c(1.5), nyears=50, t
 ######################### STEP 5: RUN REINTRODUCTION SCENARIOS #########################
 ########################################################################################
 
-## test scenario
+## Test scenario
 
 nyears <- 50
 timeunit <- 1/12
@@ -492,7 +527,7 @@ for(i in 1:nruns){
 }
 res
 
-write.csv(res, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/noIntro_1F.csv", row.names=F)
+write.csv(res, file=paste0(workingDir,"pva_ABM_50year/test.csv"), row.names=F)
 
 ## Scenarios A1-I1: Mountain gorilla
 ## Scenarios A2-I2: Western gorilla
@@ -515,7 +550,7 @@ for(i in 1:nruns){
 }
 res
 
-write.csv(res, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/noIntro_1F.csv", row.names=F)
+write.csv(res, file=paste0(workingDir,"pva_ABM_50year/ScenarioA.csv"), row.names=F)
 
 ## Scenario B
 ## Scenario B1: two individuals (adult female 19 years old, juvenile is a female, no reintroduced females added to the population)
@@ -535,7 +570,7 @@ for(i in 1:nruns){
 }
 res0
 
-write.csv(res0, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/noIntro_2F.csv", row.names=F)
+write.csv(res0, file=paste0(workingDir,"pva_ABM_50year/ScenarioB.csv"), row.names=F)
 
 ## Scenario C
 ## Scenario C1: three individuals (adult female 19 years old, 2 reintroduced females added to the population)
@@ -555,7 +590,7 @@ for(i in 1:nruns){
 }
 res1
 
-write.csv(res1, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/2Intro_3F.csv", row.names=F)
+write.csv(res1, file=paste0(workingDir,"pva_ABM_50year/ScenarioC.csv"), row.names=F)
 
 ## Scenario D
 ## Scenario D1: four individuals (adult female 19 years old, 3 reintroduced females added to the population)
@@ -575,7 +610,7 @@ for(i in 1:nruns){
 }
 res2
 
-write.csv(res2, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/3Intro_4F.csv", row.names=F)
+write.csv(res2, file=paste0(workingDir,"pva_ABM_50year/ScenarioD.csv"), row.names=F)
 
 ## Scenario E
 ## Scenario E1: five individuals (adult female 19 years old, 4 reintroduced females added to the population)
@@ -595,7 +630,7 @@ for(i in 1:nruns){
 }
 res3
 
-write.csv(res3, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/4Intro_5F.csv", row.names=F)
+write.csv(res3, file=paste0(workingDir,"pva_ABM_50year/ScenarioE.csv"), row.names=F)
 
 ## Scenario F
 ## Scenario F1: six individuals (adult female 19 years old, 5 reintroduced females added to the population)
@@ -615,7 +650,7 @@ for(i in 1:nruns){
 }
 res4
 
-write.csv(res4, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/5Intro_6F.csv", row.names=F)
+write.csv(res4, file=paste0(workingDir,"pva_ABM_50year/ScenarioF.csv"), row.names=F)
 
 ## Scenario G
 ## Scenario G1: seven individuals (adult female 19 years old, 6 reintroduced females added to the population)
@@ -635,7 +670,7 @@ for(i in 1:nruns){
 }
 res5
 
-write.csv(res5, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/6Intro_7F.csv", row.names=F)
+write.csv(res5, file=paste0(workingDir,"pva_ABM_50year/ScenarioG.csv"), row.names=F)
 
 ## Scenario H
 ## Scenario H1: eight individuals (adult female 19 years old, 7 reintroduced females added to the population)
@@ -655,7 +690,7 @@ for(i in 1:nruns){
 }
 res6
 
-write.csv(res6, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/7Intro_8F.csv", row.names=F)
+write.csv(res6, file=paste0(workingDir,"pva_ABM_50year/ScenarioH.csv"), row.names=F)
 
 ## Scenario I
 ## Scenario I1: nine individuals (adult female 19 years old, 8 reintroduced females added to the population)
@@ -675,7 +710,7 @@ for(i in 1:nruns){
 }
 res7
 
-write.csv(res7, file="/Users/neethaiyer/Box Sync/PVA_Paper/Draft6_PVA_R/pva_ABM_50year/8Intro_9F.csv", row.names=F)
+write.csv(res7, file=paste0(workingDir,"pva_ABM_50year/ScenarioI.csv"), row.names=F)
 
 ########################################################################################
 ################# STEP 6: EXAMINE DATA FROM REINTRODUCTION SCENARIOS ###################
