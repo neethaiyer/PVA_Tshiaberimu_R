@@ -328,42 +328,40 @@ lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for
 }
 
 ########################################################################################
-############################ PART 3: Individual-based model ############################
+############################ PART 3: Individual-based model (IBM) ############################
 ########################################################################################
 
-## We specified 5 categories of females: 
-## infant (I), subadult, cycling adult female (C), pregnant adult female (P), lactating adult female (L), and females that lose their infants (CD)
+## We specified 5 categories of individuals: 
+## infant (I), weaned immature female, cycling adult female (C), pregnant adult female (P), lactating adult female (L), and females that lose their infants (CD)
 ## Thus, our IBM will inclde both an age and reproductive status category vector. See STEPS 1-2 below.
 
 ########################################################################################
 ######################## STEP 1: AGE CATEGORIES FOR INDIVIDUALS ########################
 ########################################################################################
 
-N0 <- n ## Proportion of individual in each 1-year-long age class
 ages0 <- numeric(0)
-for(i in 1:100) ages0 <- c(ages0, which(rmultinom(1,1,prob=n)==1))
+ages0 <- rep(1:length(n), rmultinom(1,100,prob=n))##we start with 100 individuals
+hist(ages0)
 
 ## A. Parameters for MTN (optimistic model)
 ## Set up a variable that keeps track of the time since entry into the current age category
 time0 <- numeric(length(ages0))
 ## given an individual's age0 at time0, how many years has it been since entering the current age category?
-time0[(ages0-3.5)>=0 & (ages0-3.5)<3] <- ages0[(ages0-3.5)>=0 & (ages0-3.5)<3]-3.5 
+time0[(ages0-3.5)>=0 & (ages0-3.5)<2.5] <- ages0[(ages0-3.5)>=0 & (ages0-3.5)<2.5]-3.5 
 time0[(ages0-6)>=0 & (ages0-6)<2] <- ages0[(ages0-6)>=0 & (ages0-6)<2]-6
 time0[(ages0-8)>=0] <- 0
 time0 <- time0[ages0>=3.5]
 ages0 <- ages0[ages0>=3.5]
-plot(ages0,time0, xaxt="n");axis(1, at=0:max(ages0), labels = 0:max(ages0), cex.axis=.8)
 
 ## B. Parameters for WLG (conservative model)
 ## Set up a variable that keeps track of the time since entry into the current age category
 time0 <- numeric(length(ages0))
 ## given an individual's age0 at time0, how many years has it been since entering the current age category? 
-time0[(ages0-4.5)>=0 & (ages0-4.5)<4] <- ages0[(ages0-4.5)>=0 & (ages0-4.5)<4]-4.5 
+time0[(ages0-4.5)>=0 & (ages0-4.5)<1.5] <- ages0[(ages0-4.5)>=0 & (ages0-4.5)<4]-4.5 
 time0[(ages0-8)>=0 & (ages0-8)<2] <- ages0[(ages0-8)>=0 & (ages0-8)<2]-8
 time0[(ages0-10)>=0] <- 0
 time0 <- time0[ages0>=4.5]
 ages0 <- ages0[ages0>=4.5]
-plot(ages0,time0, xaxt="n");axis(1, at=0:max(ages0), labels = 0:max(ages0), cex.axis=.8)
 
 ########################################################################################
 ######################## STEP 2: BREEDING STATUS OF INDIVIDUALS ########################
@@ -389,45 +387,28 @@ data.frame(ages0, time0, status0)
 
 ## Transition probabilities, in relation to time since entry in current category
 
-## A. Transition probabilities (MTN)
+datX <- dat
+weaningAge <- 4.5
+#datX <- dat1
+#weaningAge <- 3.5
+
+## Transition probabilities (MTN or WLG)
 ## t is the time passed in the initial class
-timeunit <- 1/12 ## in years
+timeunit <- 1/12 ## in years. Each time step is 1 month
 IC <- function(t) ifelse(t<8, 0, 1) ## Probability for an immature to transition to adult is zero if t<8 and 1 if t>=8
 alpha <- .99 ## Probability to be pregnant after 12 months being cycling
 # (1-p)^(1/timeunit)=1-alpha
 # log(1-p)=log(1-alpha)/(1/timeunit)
 # p=1-exp(log(1-alpha)/(1/timeunit))
-1-exp(log(1-0.9999)/(1/timeunit))
-CP <- function(t, alpha) 1-exp(log(1-alpha)/(1/timeunit)) ## Probability for a cycling adult to become pregnant given the alpha value
-PL <- function(t) ifelse(t<8.5/12, 0, 1) ## Probability for a pregnant adult to lactate after 8.5 months
-# (1-p)^(1/timeunit)=1-209
-# log(1-p)=log(1-0.209)/(1/timeunit)
-# p=1-exp(log(1-0.209)/(1/timeunit))
-LCdeathInf <- function(t) 1-exp(log(1-dat[trunc(t+1),2])/(1/timeunit)) 
-LC <- function(t) ifelse(t<3.5,0,1) ## Weaning
-deathRate <- function(age) 1-exp(log(1-dat[trunc(age+1),2])/(1/timeunit)) ## death rate, per month
+CP <- function(t, alpha) 1-exp(log(1-alpha)/(1/timeunit)) ## Probability for a cycling adult female to become pregnant, per time step, given the alpha value
+PL <- function(t) ifelse(t<8.5/12, 0, 1) ## Probability for a pregnant adult female to transition to "lactating" is 1 if she's been pregnant for 8.5 months
+LCdeathInf <- function(t) 1-exp(log(1-datX[trunc(t+1),2])/(1/timeunit))  ##probability that a lactating female becomes "cycling" due to the loss of her dependent infant
+LC <- function(t) ifelse(t<weaningAge,0,1) ## Weaning
+deathRate <- function(age) 1-exp(log(1-datX[trunc(age+1),2])/(1/timeunit)) ## death rate, per month
 
-## B. Transition probabilities (WLG)
-## t is the time passed in the initial class
-timeunit <- 1/12 ## in years
-IC <- function(t) ifelse(t<10, 0, 1) ## Probability for an immature to transition to adult is zero if t<10 and 1 if t>=10
-alpha <- .99 # Probability to be pregnant after 12 months being cycling
-## Consider this in the discussion: if we allow alpha to vary for the females
-# (1-p)^(1/timeunit)=1-alpha
-# log(1-p)=log(1-alpha)/(1/timeunit)
-# p=1-exp(log(1-alpha)/(1/timeunit))
-1-exp(log(1-0.9999)/(1/timeunit))
-CP <- function(t, alpha) 1-exp(log(1-alpha)/(1/timeunit))
-PL <- function(t) ifelse(t<10.5/12, 0, 1)
-# (1-p)^(1/timeunit)=1-209
-# log(1-p)=log(1-0.209)/(1/timeunit)
-# p=1-exp(log(1-0.209)/(1/timeunit))
-LCdeathInf <- function(t) 1-exp(log(1-dat[trunc(t+1),2])/(1/timeunit)) 
-LC <- function(t) ifelse(t<4.5,0,1) ## Weaning
-deathRate <- function(age) 1-exp(log(1-dat[trunc(age+1),2])/(1/timeunit)) ## death rate, per month
 
-## ICPL
-## Change in status of each agent in model, including whether PL to C to I
+## I,C,P,L,CD
+## Change in status of each agent in model
 statusChange <- function(value, t, alpha){
   if(value=="I"){
     if(rbinom(1,1,IC(t))){
@@ -441,20 +422,16 @@ statusChange <- function(value, t, alpha){
     if(rbinom(1,1,PL(t))){
       return("L")
     } else return('P')
-  } else if(!rbinom(1,1,LC(t))){
-    if(!rbinom(1,1,LCdeathInf(t))) {
-      #print("case1")
-      return("L")
-    } else return("CD")#"CD" means the female is back cycling after the death of her infant
-  } else if (!rbinom(1,1,LCdeathInf(t))){
-    #print("case2")
-    return("C")
-  } else return('CD')
+  } else if(!rbinom(1,1,LC(t))){		##if infant doesn't get weaned because it's too young
+    if(!rbinom(1,1,LCdeathInf(t))) {	##if infant doesn't die
+      return("L")						##still lactating
+    } else return("CD")					##if infant dies, female becomes "CD", ie she's back cycling after the death of her infant
+  } else  return("C")
 }
 
-## Possible statuses: ICPL
-statusChange("L", 0.6, 0.99)
-statusChange("C", 3/12, 0.99)
+## Possible statuses: I,C,P,L,CD
+# statusChange("L", 0.6, 0.99)
+# statusChange("C", 3/12, 0.99)
 
 ########################################################################################
 #################### STEP 4: SIMULATION FUNCTION FOR STOCHASTIC IBM ####################
