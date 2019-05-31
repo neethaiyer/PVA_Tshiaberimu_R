@@ -49,12 +49,12 @@ dat <- read.csv(paste0(workingDir, "Breuer_western gorilla life table.csv"))
 dat1 <- read.csv(paste0(workingDir, "Bronikowski_Eastern female gorilla life table.csv"))
 
 ## Transform WLG life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
-mat <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create square matrix with 0s everywhere
-mat[1,] <- dat[,3] ## first row in matrix assigned the fertility rates from the life table
-mat2 <- matrix(0,ncol=ncol(mat)-1, nrow=ncol(mat)-1) 
+mat_wlg <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create square matrix with 0s everywhere
+mat_wlg[1,] <- dat[,3] ## first row in matrix assigned the fertility rates from the life table
+mat2 <- matrix(0,ncol=ncol(mat_wlg)-1, nrow=ncol(mat_wlg)-1) 
 diag(mat2) <- 1-dat[-nrow(dat),2] ## survival rates are assigned to just under the diagonal of a LM
-mat[2:nrow(mat), 1:(ncol(mat)-1)] <- mat2
-head(mat) ## View and check matrix
+mat_wlg[2:nrow(mat_wlg), 1:(ncol(mat_wlg)-1)] <- mat2
+head(mat_wlg) ## View and check matrix
 
 ## Transform MTN life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
 mat_mtn <- matrix(0, nrow=nrow(dat1), ncol=nrow(dat1)) ## create square matrix with 0s everywhere
@@ -65,7 +65,7 @@ mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
 head(mat_mtn) ## View and check matrix
 
 ## Calculate the eigenvalue of the matrices
-eigenvalues_wlg <- eigen(mat, only.values=TRUE)
+eigenvalues_wlg <- eigen(mat_wlg, only.values=TRUE)
 eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
 Re(eigenvalues_wlg$values[1]) ## this is the dominant eigenvalue of the WLG LM, i.e. lambda = 1.020623
 Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.032567
@@ -147,8 +147,9 @@ legend(15, 1, legend=c("Western Gorillas", "Mountain Gorillas"),
 ## 3. Probability of extinction for each scenario was calculated as the total proportion of simulations that resulted in a final population size of 0 females. 
 
 ## The function below returns the deterministic LM population size projection, using the projection period (tfinal), age and number of females in the starting population (No) and Leslie matrix (LM). 
-matrix <- mat_mtn ## make sure you choose either the WLG or MTN LM (mat or mat_mtn respectively)
-pop_projection <- function(tfinal, LM=matrix, No=No){
+mat <- mat_mtn ## make sure you choose either the WLG or MTN LM (mat or mat_mtn respectively)
+#mat <- mat_wlg
+pop_projection <- function(tfinal, LM=mat, No=No){
   pop <- N <- No
   for (i in 1:tfinal){
     pop <- LM%*%pop
@@ -158,7 +159,7 @@ pop_projection <- function(tfinal, LM=matrix, No=No){
 }
 
 ## The function below returns the stochastic LM population size projection, using the projection period (tfinal), age and number of females in the starting population (No) and Leslie matrix (LM). 
-stoch_projection <- function(tfinal, LM=matrix, No=No){
+stoch_projection <- function(tfinal, LM=mat, No=No){
   pop <- N <- No
   for (i in 1:tfinal){
   	currentpop <- pop
@@ -175,211 +176,95 @@ stoch_projection <- function(tfinal, LM=matrix, No=No){
 nyears <- 50 ## projection period
 ## Scenario A: starting population as current Tshiaberimu status: 1 adult female (assuming juvenile is M) / age:19
 No <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N <- pop_projection(tfinal=nyears, LM=matrix, No=No) 
+N <- pop_projection(tfinal=nyears, LM=mat, No=No) 
 N_projected_det <- apply(N,2,sum)
 
 ## Scenario B: starting population as current Tshiaberimu status: 1 juvenile, 1 adult female (assuming juvenile is F) / age:5,19
 No_0 <- c(0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N <- pop_projection(tfinal=nyears, LM=matrix, No=No_0) 
+N <- pop_projection(tfinal=nyears, LM=mat, No=No_0) 
 N_projected_det0 <- apply(N,2,sum)
 
 ## Scenario C: starting population 1F plus 2 Fs reintroduced / age:7,7,19
 No_2 <- c(0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N2 <- pop_projection(tfinal=nyears, LM=matrix, No=No_2)
+N2 <- pop_projection(tfinal=nyears, LM=mat, No=No_2)
 N_projected_det2 <- apply(N2,2,sum)
 
 ## Scenario D: starting population 1F plus 3 Fs reintroduced / age:7,7,8,19
 No_3 <- c(0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N3 <- pop_projection(tfinal=nyears, LM=matrix, No=No_3)
+N3 <- pop_projection(tfinal=nyears, LM=mat, No=No_3)
 N_projected_det3 <- apply(N3,2,sum)
 
 ## Scenario E: starting population 1F plus 4 Fs reintroduced / age:7,7,8,9,19
 No_4 <- c(0,0,0,0,0,0,0,2,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N4 <- pop_projection(tfinal=nyears, LM=matrix, No=No_4)
+N4 <- pop_projection(tfinal=nyears, LM=mat, No=No_4)
 N_projected_det4 <- apply(N4,2,sum)
 
 ## Scenario F: starting population 1F plus 5 Fs reintroduced / age:7,7,8,9,12,19
 No_5 <- c(0,0,0,0,0,0,0,2,1,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N5 <- pop_projection(tfinal=nyears, LM=matrix, No=No_5)
+N5 <- pop_projection(tfinal=nyears, LM=mat, No=No_5)
 N_projected_det5 <- apply(N5,2,sum)
 
 ## Scenario G: starting population 1F plus 6 Fs reintroduced / age:7,7,8,9,12,12,19
 No_6 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N6 <- pop_projection(tfinal=nyears, LM=matrix, No=No_6)
+N6 <- pop_projection(tfinal=nyears, LM=mat, No=No_6)
 N_projected_det6 <- apply(N6,2,sum)
 
 ## Scenario H: starting population 1F plus 7 Fs reintroduced / age:7,7,8,9,12,12,17,19
 No_7 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N7 <- pop_projection(tfinal=nyears, LM=matrix, No=No_7)
+N7 <- pop_projection(tfinal=nyears, LM=mat, No=No_7)
 N_projected_det7 <- apply(N7,2,sum)
 
 ## Scenario I: starting population 1F plus 8 Fs reintroduced / age:7,7,8,9,12,12,17,17,19
 No_8 <- c(0,0,0,0,0,0,0,2,1,1,0,0,2,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-N8 <- pop_projection(tfinal=nyears, LM=matrix, No=No_8)
+N8 <- pop_projection(tfinal=nyears, LM=mat, No=No_8)
 N_projected_det8 <- apply(N8,2,sum)
 
 ## Second, let's use the stochastic function: 
 nruns <- 1000 ## number of simulations of the model
 ## The temp vectors are empty matrices that will save the number of individuals for each year of the projection for each run of the projection 
-temp <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp0 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp2 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp3 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp4 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp5 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp6 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp7 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
-temp8 <- matrix(0, nrow=trunc(nyears)+1, ncol=nruns)
+temp <- temp0 <- temp2 <- temp3 <- temp4 <- temp5 <- temp6 <- temp7 <- temp8 <- matrix(0, nrow=nyears+1, ncol=nruns)
 
 ## run each scenario 1000 times using the stochastic projection
 for(i in 1:nruns) {
-  N_projected_stoch <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No),2,sum)
-  N_projected_stoch0 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_0),2,sum)
-  N_projected_stoch2 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_2),2,sum)
-  N_projected_stoch3 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_3),2,sum)
-  N_projected_stoch4 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_4),2,sum)
-  N_projected_stoch5 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_5),2,sum)
-  N_projected_stoch6 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_6),2,sum)
-  N_projected_stoch7 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_7),2,sum)
-  N_projected_stoch8 <- apply(stoch_projection(tfinal=nyears, LM=matrix, No=No_8),2,sum)
-  temp[1:length(N_projected_stoch),i] <- N_projected_stoch
-  temp0[1:length(N_projected_stoch0),i] <- N_projected_stoch0
-  temp2[1:length(N_projected_stoch2),i] <- N_projected_stoch2
-  temp3[1:length(N_projected_stoch3),i] <- N_projected_stoch3
-  temp4[1:length(N_projected_stoch4),i] <- N_projected_stoch4
-  temp5[1:length(N_projected_stoch5),i] <- N_projected_stoch5
-  temp6[1:length(N_projected_stoch6),i] <- N_projected_stoch6
-  temp7[1:length(N_projected_stoch7),i] <- N_projected_stoch7
-  temp8[1:length(N_projected_stoch8),i] <- N_projected_stoch8
+  temp[1:length(N_projected_stoch),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum)
+  temp0[1:length(N_projected_stoch0),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_0),2,sum)
+  temp2[1:length(N_projected_stoch2),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_2),2,sum)
+  temp3[1:length(N_projected_stoch3),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_3),2,sum)
+  temp4[1:length(N_projected_stoch4),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_4),2,sum)
+  temp5[1:length(N_projected_stoch5),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_5),2,sum)
+  temp6[1:length(N_projected_stoch6),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_6),2,sum)
+  temp7[1:length(N_projected_stoch7),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_7),2,sum)
+  temp8[1:length(N_projected_stoch8),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_8),2,sum)
 }
 
-## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches 50 individuals within 50 years?
-## See how many times final population is less than 0 (in last row of temp matrix) or greater than 50. You can also do this for other Ne values (eg. 40, 100, 150)
+## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
 
-##SCENARIO A
-ext <- temp[nrow(temp),]==0
-probExt <- length(ext[ext==TRUE])/length(ext)
-Ne_150 <- temp==150
-Ne_100 <- temp==100
-Ne_50 <- temp==50
-Ne_40 <- temp==40
-probNe_150 <- length(Ne_150[Ne_150==TRUE])/nruns
-probNe_100 <- length(Ne_100[Ne_100==TRUE])/nruns
-probNe_50 <- length(Ne_50[Ne_50==TRUE])/nruns
-probNe_40 <- length(Ne_40[Ne_40==TRUE])/nruns
 
-##SCENARIO B
-ext0 <- temp0[nrow(temp0),]==0
-probExt0 <- length(ext0[ext0==TRUE])/length(ext0)
-Ne0_150 <- temp0==150
-Ne0_100 <- temp0==100
-Ne0_50 <- temp0==50
-Ne0_40 <- temp0==40
-probNe0_150 <- length(Ne0_150[Ne0_150==TRUE])/nruns
-probNe0_100 <- length(Ne0_100[Ne0_100==TRUE])/nruns
-probNe0_50 <- length(Ne0_50[Ne0_50==TRUE])/nruns
-probNe0_40 <- length(Ne0_40[Ne0_40==TRUE])/nruns
-
-##SCENARIO C
-ext2 <- temp2[nrow(temp2),]==0
-probExt2 <- length(ext2[ext2==TRUE])/length(ext2)
-Ne2_150 <- temp2==150
-Ne2_100 <- temp2==100
-Ne2_50 <- temp2==50
-Ne2_40 <- temp2==40
-probNe2_150 <- length(Ne2_150[Ne2_150==TRUE])/nruns
-probNe2_100 <- length(Ne2_100[Ne2_100==TRUE])/nruns
-probNe2_50 <- length(Ne2_50[Ne2_50==TRUE])/nruns
-probNe2_40 <- length(Ne2_40[Ne2_40==TRUE])/nruns
-
-##SCENARIO D
-ext3 <- temp3[nrow(temp3),]==0
-probExt3 <- length(ext3[ext3==TRUE])/length(ext3)
-Ne3_150 <- temp3==150
-Ne3_100 <- temp3==100
-Ne3_50 <- temp3==50
-Ne3_40 <- temp3==40
-probNe3_150 <- length(Ne3_150[Ne3_150==TRUE])/nruns
-probNe3_100 <- length(Ne3_100[Ne3_100==TRUE])/nruns
-probNe3_50 <- length(Ne3_50[Ne3_50==TRUE])/nruns
-probNe3_40 <- length(Ne3_40[Ne3_40==TRUE])/nruns
-
-##SCENARIO E
-ext4 <- temp4[nrow(temp4),]==0
-probExt4 <- length(ext4[ext4==TRUE])/length(ext4)
-Ne4_150 <- temp4==150
-Ne4_100 <- temp4==100
-Ne4_50 <- temp4==50
-Ne4_40 <- temp4==40
-probNe4_150 <- length(Ne4_150[Ne4_150==TRUE])/nruns
-probNe4_100 <- length(Ne4_100[Ne4_100==TRUE])/nruns
-probNe4_50 <- length(Ne4_50[Ne4_50==TRUE])/nruns
-probNe4_40 <- length(Ne4_40[Ne4_40==TRUE])/nruns
-
-##SCENARIO F
-ext5 <- temp5[nrow(temp5),]==0
-probExt5 <- length(ext5[ext5==TRUE])/length(ext5)
-Ne5_150 <- temp5==150
-Ne5_100 <- temp5==100
-Ne5_50 <- temp5==50
-Ne5_40 <- temp5==40
-probNe5_150 <- length(Ne5_150[Ne5_150==TRUE])/nruns
-probNe5_100 <- length(Ne5_100[Ne5_100==TRUE])/nruns
-probNe5_50 <- length(Ne5_50[Ne5_50==TRUE])/nruns
-probNe5_40 <- length(Ne5_40[Ne5_40==TRUE])/nruns
-
-##SCENARIO G
-ext6 <- temp6[nrow(temp6),]==0
-probExt6 <- length(ext6[ext6==TRUE])/length(ext6)
-Ne6_150 <- temp6==150
-Ne6_100 <- temp6==100
-Ne6_50 <- temp6==50
-Ne6_40 <- temp6==40
-probNe6_150 <- length(Ne6_150[Ne6_150==TRUE])/nruns
-probNe6_100 <- length(Ne6_100[Ne6_100==TRUE])/nruns
-probNe6_50 <- length(Ne6_50[Ne6_50==TRUE])/nruns
-probNe6_40 <- length(Ne6_40[Ne6_40==TRUE])/nruns
-
-##SCENARIO H
-ext7 <- temp7[nrow(temp7),]==0
-probExt7 <- length(ext7[ext7==TRUE])/length(ext7)
-Ne7_150 <- temp7==150
-Ne7_100 <- temp7==100
-Ne7_50 <- temp7==50
-Ne7_40 <- temp7==40
-probNe7_150 <- length(Ne7_150[Ne7_150==TRUE])/nruns
-probNe7_100 <- length(Ne7_100[Ne7_100==TRUE])/nruns
-probNe7_50 <- length(Ne7_50[Ne7_50==TRUE])/nruns
-probNe7_40 <- length(Ne7_40[Ne7_40==TRUE])/nruns
-
-##SCENARIO I
-ext8 <- temp8[nrow(temp8),]==0
-probExt8 <- length(ext8[ext8==TRUE])/length(ext8)
-Ne8_150 <- temp8==150
-Ne8_100 <- temp8==100
-Ne8_50 <- temp8==50
-Ne8_40 <- temp8==40
-probNe8_150 <- length(Ne8_150[Ne8_150==TRUE])/nruns
-probNe8_100 <- length(Ne8_100[Ne8_100==TRUE])/nruns
-probNe8_50 <- length(Ne8_50[Ne8_50==TRUE])/nruns
-probNe8_40 <- length(Ne8_40[Ne8_40==TRUE])/nruns
-
-## Let's save these probabilites as a dataframe:
 prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]), 
-                           probability_150 =  (c(probNe_150, probNe0_150, probNe2_150, probNe3_150, probNe4_150, probNe5_150, probNe6_150, probNe7_150, probNe8_150)*100), 
-                           probability_100 = (c(probNe_100, probNe0_100, probNe2_100, probNe3_100, probNe4_100, probNe5_100, probNe6_100, probNe7_100, probNe8_100)*100), 
-                           prob_50 = (c(probNe_50, probNe0_50, probNe2_50, probNe3_50, probNe4_50, probNe5_50, probNe6_50, probNe7_50, probNe8_50)*100), 
-                           prob_40 = (c(probNe_40, probNe0_40, probNe2_40, probNe3_40, probNe4_40, probNe5_40, probNe6_40, probNe7_40, probNe8_40)*100), 
-                           prob_Extn = (c(probExt, probExt0, probExt2, probExt3, probExt4, probExt5, probExt6, probExt7, probExt8)*100))
-
-prob_extn_lm <- data.frame(scenario = as.factor(LETTERS[1:9]), 
-                           prob_Extn = (c(probExt, probExt0, probExt2, probExt3, probExt4, probExt5, probExt6, probExt7, probExt8)*100))
+                           probability_150 =  NA, 
+                           probability_100 = NA, 
+                           prob_50 = NA, 
+                           prob_40 = NA, 
+                           prob_Extn = NA)
+index <- 0
+for(i in c("temp", "temp0", "temp2", "temp3", "temp4", "temp5", "temp6", "temp7", "temp8")){
+	index <- index+1
+	tempx <- get(i)
+	ext <- tempx[nrow(tempx),]==0
+	probExt <- mean(ext)
+	probNe_150 <- mean(tempx[nrow(tempx),]>=150)
+	probNe_100 <- mean(tempx[nrow(tempx),]>=100)
+	probNe_50 <- mean(tempx[nrow(tempx),]>=50)
+	probNe_40 <- mean(tempx[nrow(tempx),]>=40)
+prob_50years[index,2:6] <- c(probNe_150, probNe_100, probNe_50, probNe_40, probExt)*100	
+}
 
 ## Make sure you use the correct LM for WLG or MTN when you run the code
 ## WLG values
-write.csv(prob_extn_lm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/extn_lm_WLG.csv", row.names=F)
+#dir.create(paste0(workingDir,"pva_lambda_extn"))##run this line if pva_lambda_extn does not exist and needs to be created
+write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"), row.names=F)
 ## MTN values
-write.csv(prob_extn_lm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/extn_lm_MTN.csv", row.names=F)
+write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"), row.names=F)
 
 ################################################################################################
 ###################################### PLOTS for LM ############################################
@@ -389,22 +274,22 @@ write.csv(prob_extn_lm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberi
 ## png(file_path, width=4, height=4, units='in', res=100)
 
 ## Let's plot lambda and extinction probabilities. Use the correct dataframe for either WLG or MTN:
-parameters_wlg_lm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/extn_lm_WLG.csv"))
-parameters_mtn_lm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/extn_lm_MTN.csv"))
+prob_50years_wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
+prob_50years_mtn_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"))
 
 ################################################################################################
 ################################ Plots of extinction probability  ##############################
 ################################################################################################
 
 plot.new()
-par(mar=c(5.1,4.1,4.1,5.1))
+par(mfrow=c(1,1), mar=c(5.1,4.1,4.1,5.1))
 plot.window(xlim=c(1,9), ylim=c(0,100))
 axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
 title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
-lines(parameters_wlg_lm$scenario, parameters_wlg_lm$prob_Extn, bg="coral", type="b", pch=21)
-lines(parameters_mtn_lm$scenario, parameters_mtn_lm$prob_Extn, bg="azure4", type="b", pch=24)
+lines(prob_50years_wlg_lm$scenario, prob_50years_wlg_lm$prob_Extn, bg="coral", type="b", pch=21)
+lines(prob_50years_mtn_lm$scenario, prob_50years_mtn_lm$prob_Extn, bg="azure4", type="b", pch=24)
 legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas"),
        pt.bg=c("coral", "azure4"), lty=c(1,1), text.font=2, pch=c(21,24))
 
@@ -420,139 +305,28 @@ maxY <- 120 ## max y-axis value
 time <- 0:50 ## time interval for the plots
 
 #################################################
-############## PLOT FOR Scenario A ##############
+############## PLOT FOR Scenarios A to I ##############
 #################################################
+simObjects <- c("temp", "temp0", "temp2", "temp3", "temp4", "temp5", "temp6", "temp7", "temp8")
+detObjects <- c("N_projected_det", "N_projected_det0", "N_projected_det2", "N_projected_det3", "N_projected_det4", "N_projected_det5", "N_projected_det6", "N_projected_det7", "N_projected_det8")
+
+for(j in 1:9){
+probExt <- prob_50years_wlg_lm[j,6]
+#probExt <- prob_50years_mtn_lm[,6]##uncomment this line for mountain gorilla demographic parameter simulations
+tempX <- get(simObjects[j])
+N_projected_detX <- get(detObjects[j])
 plot(N_projected_det~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp)){
-  lines(time, temp[,i], col=grey(.9), lwd=2)
+for(i in 1:ncol(tempX)){
+  lines(time, tempX[,i], col=grey(.8, alpha=.05), lwd=3)
 } ## plots projections from stochastic LM simulations
-lines(apply(temp, 1, mean)~time, type="l", col=2, lwd=4) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="A: No introduction, male juvenile", sub=paste0("Probability of extinction = ",probExt*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp)-1)), qtiles[1,], col=1, lty=2)
-lines((0:(nrow(temp)-1)), qtiles[2,], col=1, lty=2)
+lines(apply(tempX, 1, mean)~time, type="l", col=2, lwd=4) ## plot mean projection from stochastic LM simulations
+lines(N_projected_detX~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
+title(main="A: No introduction, male juvenile", sub=paste0("Probability of extinction = ",probExt, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
+qtiles <- apply(tempX, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
+lines((0:(nrow(tempX)-1)), qtiles[1,], col=1, lty=2)
+lines((0:(nrow(tempX)-1)), qtiles[2,], col=1, lty=2)
 lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
-
-#################################################
-############## PLOT FOR Scenario B ##############
-#################################################
-plot(N_projected_det0~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp0)){
-  lines(time, temp0[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp0, 1, mean)~time, type="l", col=2, lwd=4) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det0~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="B: No introduction, female juvenile", sub=paste0("Probability of extinction = ",probExt0*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp0, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp0)-1)), qtiles[1,], col=1, lty=2)
-lines((0:(nrow(temp0)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
-
-#################################################
-############## PLOT FOR Scenario C ##############
-#################################################
-plot(N_projected_det2~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp2)){
-  lines(time, temp2[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp2, 1, mean)~time, type="l", col=2, lwd=3) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det2~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="C: 2 females reintroduced", sub=paste0("Probability of extinction = ",probExt2*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp2, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp2)-1)), qtiles[1,], col=1, lty=2)
-lines((0:(nrow(temp2)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
-
-#################################################
-############## PLOT FOR Scenario D ##############
-#################################################
-plot(N_projected_det3~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp3)){
-  lines(time, temp3[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp3, 1, mean)~time, type="l", col=2, lwd=3) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det3~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="D: 3 females reintroduced", sub=paste0("Probability of extinction = ",probExt3*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp3, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp3)-1)), qtiles[1,], col=1, lty=2)
-lines((0:(nrow(temp3)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
- 
-#################################################
-############## PLOT FOR Scenario E ##############
-#################################################
-plot(N_projected_det4~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp4)){
-  lines(time, temp4[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp4, 1, mean)~time, type="l", col=2, lwd=3) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det4~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="E: 4 females reintroduced", sub=paste0("Probability of extinction = ",probExt4*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp4, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp4)-1)), qtiles[1,], col=1, lty=2)
-lines((0:(nrow(temp4)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1)
-
-#################################################
-############## PLOT FOR Scenario F ##############
-#################################################
-plot(N_projected_det5~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp5)){
-  lines(time, temp5[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp5, 1, mean)~time, type="l", col=2, lwd=3) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det5~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="F: 5 females reintroduced", sub=paste0("Probability of extinction = ",probExt5*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp5, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp5)-1)), qtiles[1,], col=1, lty=2) 
-lines((0:(nrow(temp5)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
-
-#################################################
-############## PLOT FOR Scenario G ##############
-#################################################
-plot(N_projected_det6~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp6)){
-  lines(time, temp6[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp6, 1, mean)~time, type="l", col=2, lwd=3) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det6~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="G: 6 females reintroduced", sub=paste0("Probability of extinction = ",probExt6*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp6, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp6)-1)), qtiles[1,], col=1, lty=2) 
-lines((0:(nrow(temp6)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1)
-
-#################################################
-############## PLOT FOR Scenario H ##############
-#################################################
-plot(N_projected_det7~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp7)){
-  lines(time, temp7[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp7, 1, mean)~time, type="l", col=2, lwd=3) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det7~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="H: 7 females reintroduced", sub=paste0("Probability of extinction = ",probExt7*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp7, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp7)-1)), qtiles[1,], col=1, lty=2) 
-lines((0:(nrow(temp7)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
-
-#################################################
-############## PLOT FOR Scenario I ##############
-#################################################
-plot(N_projected_det8~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
-for(i in 1:ncol(temp8)){
-  lines(time, temp8[,i], col=grey(.9), lwd=2)
-} ## plots projections from stochastic LM simulations
-lines(apply(temp8, 1, mean)~time, type="l", col=2, lwd=3) ## plot mean projection from stochastic LM simulations
-lines(N_projected_det8~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="I: 8 females reintroduced", sub=paste0("Probability of extinction = ",probExt8*100, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
-qtiles <- apply(temp8, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
-lines((0:(nrow(temp8)-1)), qtiles[1,], col=1, lty=2) 
-lines((0:(nrow(temp8)-1)), qtiles[2,], col=1, lty=2)
-lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
+}
 
 ########################################################################################
 ############################ PART 3: Individual-based model ############################
