@@ -42,11 +42,11 @@ lines(numyears, popEst_lm, col=2, lty=2, lwd=2)
 ## Data from Breuer et al (2010), Breuer (2008) for western lowland gorillas (WLG)
 ## Note the first age of reproduction is 10 years and the fertility rate was constant at 0.16 (16%) for all reproductive females. 
 
-dat <- read.csv(paste0(workingDir, "Breuer_western gorilla life table.csv"))
+dat <- read.csv(paste0(workingDir, "LifeTable_WLG_Breuer.csv"))
 
 ## Data from Bronikowski et al (2016) for mountain gorillas (MTN)
 ## Note the first age of reproduction is 8 years although the first birth is usually at 10 years old for mountain gorillas and the fertility rate varied for each adult year.
-dat1 <- read.csv(paste0(workingDir, "Bronikowski_Eastern female gorilla life table.csv"))
+dat1 <- read.csv(paste0(workingDir, "LifeTable_MTN_Bronikowski.csv"))
 
 ## Transform WLG life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
 mat_wlg <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create square matrix with 0s everywhere
@@ -55,6 +55,7 @@ mat2 <- matrix(0,ncol=ncol(mat_wlg)-1, nrow=ncol(mat_wlg)-1)
 diag(mat2) <- 1-dat[-nrow(dat),2] ## survival rates are assigned to just under the diagonal of a LM
 mat_wlg[2:nrow(mat_wlg), 1:(ncol(mat_wlg)-1)] <- mat2
 head(mat_wlg) ## View and check matrix
+write.csv(mat_wlg, file=paste0(workingDir,"LeslieMatrix_WLG.csv"), row.names=F)
 
 ## Transform MTN life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
 mat_mtn <- matrix(0, nrow=nrow(dat1), ncol=nrow(dat1)) ## create square matrix with 0s everywhere
@@ -63,6 +64,7 @@ mat_mtn_2 <- matrix(0,ncol=ncol(mat_mtn)-1, nrow=ncol(mat_mtn)-1)
 diag(mat_mtn_2) <- 1-dat1[-nrow(dat1),2] ## survival rates are assigned to just under the diagonal of a LM
 mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
 head(mat_mtn) ## View and check matrix
+write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN.csv"), row.names=F)
 
 ## Calculate the eigenvalue of the matrices
 eigenvalues_wlg <- eigen(mat_wlg, only.values=TRUE)
@@ -173,78 +175,22 @@ stoch_projection <- function(tfinal, LM=mat, No=No){
 
 ## Now, let's apply the functions using each reintrodcution scenario. Load the appropriate csv file.
 ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv"))
+
 ## First, let's use the deterministic function:
-
-#### NEETHA WORK ON THIS FUNCTION FOR LOOPING THROUGH BELOW:
-
 nyears <- 50 ## projection period
-function (reintroscenario){
-  No_i <- ReintroScenario$No_i
-  N_i <- pop_projection(tfinal=nyears, LM=mat, No=No_i) 
-  N_projected_deti <- apply(N_i,2,sum)
-}
-
-for(i in c("ReintroScenario$No_A", "ReintroScenario$No_B", "ReintroScenario$No_C", "ReintroScenario$No_D", "ReintroScenario$No_E", "ReintroScenario$No_F", "ReintroScenario$No_G", "ReintroScenario$No_H", "ReintroScenario$No_I")){
-  ReintroScenario$No_X <- get(i)
-  No_i <- get(i)
-  N_i <- get(i)
-  N_projected_deti <- get(i)
-  ## Apply the deterministic projection to all scenarios
- 
-}
-
-nyears <- 50 ## projection period
-## Scenario A: starting population as current Tshiaberimu status: 1 adult female (assuming juvenile is M) / age:19
-No_A <- ReintroScenario$No_A
-N_A <- pop_projection(tfinal=nyears, LM=mat, No=No_A) 
-N_projected_detA <- apply(N_A,2,sum)
-
-## Scenario B: starting population as current Tshiaberimu status: 1 juvenile, 1 adult female (assuming juvenile is F) / age:5,19
-No_B <- ReintroScenario$No_B
-N_B <- pop_projection(tfinal=nyears, LM=mat, No=No_B) 
-N_projected_detB <- apply(N_B,2,sum)
-
-## Scenario C: starting population 1F plus 2 Fs reintroduced / age:7,7,19
-No_C <- ReintroScenario$No_C
-N_C <- pop_projection(tfinal=nyears, LM=mat, No=No_C)
-N_projected_detC <- apply(N_C,2,sum)
-
-## Scenario D: starting population 1F plus 3 Fs reintroduced / age:7,7,8,19
-No_D <- ReintroScenario$No_D
-N_D <- pop_projection(tfinal=nyears, LM=mat, No=No_D)
-N_projected_detD <- apply(N_D,2,sum)
-
-## Scenario E: starting population 1F plus 4 Fs reintroduced / age:7,7,8,9,19
-No_E <- ReintroScenario$No_E
-N_E <- pop_projection(tfinal=nyears, LM=mat, No=No_E)
-N_projected_detE <- apply(N_E,2,sum)
-
-## Scenario F: starting population 1F plus 5 Fs reintroduced / age:7,7,8,9,12,19
-No_F <- ReintroScenario$No_F
-N_F <- pop_projection(tfinal=nyears, LM=mat, No=No_F)
-N_projected_detF <- apply(N_F,2,sum)
-
-## Scenario G: starting population 1F plus 6 Fs reintroduced / age:7,7,8,9,12,12,19
-No_G <- ReintroScenario$No_G
-N_G <- pop_projection(tfinal=nyears, LM=mat, No=No_G)
-N_projected_detG <- apply(N_G,2,sum)
-
-## Scenario H: starting population 1F plus 7 Fs reintroduced / age:7,7,8,9,12,12,17,19
-No_H <- ReintroScenario$No_H
-N_H <- pop_projection(tfinal=nyears, LM=mat, No=No_H)
-N_projected_detH <- apply(N_H,2,sum)
-
-## Scenario I: starting population 1F plus 8 Fs reintroduced / age:7,7,8,9,12,12,17,17,19
-No_I <- ReintroScenario$No_I
-N_I <- pop_projection(tfinal=nyears, LM=mat, No=No_I)
-N_projected_detI <- apply(N_I,2,sum)
+projectPop <- for(i in 2:ncol(ReintroScenario)){
+    No <- ReintroScenario[,i] ## Get the reintroduction scenario
+    N <- pop_projection(tfinal=nyears, LM=mat, No=No) ## Apply pop_projection function to No for this scenario
+    scenario <- strsplit(colnames(ReintroScenario)[i], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
+    assign(paste0("N_projected_det", scenario), apply(N,2,sum))  ## Apply the deterministic projection to all scenarios. The assign function takes a variable name as a character string and assigns a value to it. In this case, the values are N at each time step of the projection
+  }
 
 ## Second, let's use the stochastic function: 
 nruns <- 1000 ## number of simulations of the model
 ## The temp vectors are empty matrices that will save the number of individuals for each year of the projection for each run of the projection 
 tempA <- tempB <- tempC <- tempD <- tempE <- tempF <- tempG <- tempH <- tempI <- matrix(0, nrow=nyears+1, ncol=nruns)
 
-## run each scenario 1000 times using the stochastic projection
+## Run each scenario 1000 times using the stochastic projection
 for(i in 1:nruns) {
   tempA[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_A),2,sum)
   tempB[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_B),2,sum)
@@ -257,6 +203,12 @@ for(i in 1:nruns) {
   tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_I),2,sum)
 }
 
+for(j in 2:ncol(ReintroScenario)){
+  No <- ReintroScenario[,j]
+  scenario <- strsplit(colnames(ReintroScenario)[j], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
+  assign(paste0("temp", scenario)[1:(nyears+1),i], apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum))
+}
+
 ## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
 prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]), 
                            prob_150 =  NA, 
@@ -265,7 +217,7 @@ prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]),
                            prob_40 = NA, 
                            prob_Extn = NA)
 index <- 0
-for(i in c("temp", "temp0", "temp2", "temp3", "temp4", "temp5", "temp6", "temp7", "temp8")){
+for(i in c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH", "tempI")){
 	index <- index+1
 	tempx <- get(i)
 	ext <- tempx[nrow(tempx),]==0
