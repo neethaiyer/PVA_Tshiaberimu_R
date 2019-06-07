@@ -206,7 +206,9 @@ for(i in 1:nruns) {
 for(j in 2:ncol(ReintroScenario)){
   No <- ReintroScenario[,j]
   scenario <- strsplit(colnames(ReintroScenario)[j], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
-  assign(paste0("temp", scenario)[1:(nyears+1),i], apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum))
+  for(i in 1:nruns){
+  assign(paste0("temp", scenario), apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum))
+  }
 }
 
 ## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
