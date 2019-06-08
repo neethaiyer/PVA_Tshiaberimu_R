@@ -192,15 +192,15 @@ tempA <- tempB <- tempC <- tempD <- tempE <- tempF <- tempG <- tempH <- tempI <-
 
 ## Run each scenario 1000 times using the stochastic projection
 for(i in 1:nruns) {
-  tempA[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_A),2,sum)
-  tempB[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_B),2,sum)
-  tempC[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_C),2,sum)
-  tempD[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_D),2,sum)
-  tempE[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_E),2,sum)
-  tempF[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_F),2,sum)
-  tempG[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_G),2,sum)
-  tempH[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_H),2,sum)
-  tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=No_I),2,sum)
+  tempA[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_A),2,sum)
+  tempB[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_B),2,sum)
+  tempC[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_C),2,sum)
+  tempD[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_D),2,sum)
+  tempE[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_E),2,sum)
+  tempF[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_F),2,sum)
+  tempG[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_G),2,sum)
+  tempH[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_H),2,sum)
+  tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_I),2,sum)
 }
 
 for(j in 2:ncol(ReintroScenario)){
@@ -321,11 +321,10 @@ hist(ages0)
 ## Set up a variable that keeps track of the time since entry into the current age category
 time0 <- numeric(length(ages0))
 
-## Given an individual's age0 at time0, how many years has it been since entering the current age category?
-time0[(ages0-3.5)>=0 & (ages0-3.5)<2.5] <- ages0[(ages0-3.5)>=0 & (ages0-3.5)<2.5]-3.5 ## time since entry into unweaned category: all immatures that are between 0-3.5 years old that have been in this category for less than 2.5 years
-time0[(ages0-6)>=0 & (ages0-6)<2] <- ages0[(ages0-6)>=0 & (ages0-6)<2]-6 ## time since entry into weaned category: all immatures that are between 0-8 years old that have been in this category for less than 2 years
-time0[(ages0-8)>=0] <- 0 ## time since entry into adult category: all individuals that are older than 8 years of age now enter the C category
-time0 <- time0[ages0>=3.5] ## all unweaned individuals under 3.5 years old are not included in the model, and are modeled along with the mothers, until they are weaned.  
+## Given an individual's age0 at time0, how many years has it been since entering the current age category? 
+time0[(ages0-3.5)>=0 & (ages0-3.5)<4.5] <- ages0[(ages0-3.5)>=0 & (ages0-3.5)<4.5]-3.5 
+time0[(ages0-8)>=0] <- 0
+time0 <- time0[ages0>=3.5]
 ages0 <- ages0[ages0>=3.5]
 
 ## B. Parameters for conservative model (WLG)
@@ -333,8 +332,7 @@ ages0 <- ages0[ages0>=3.5]
 time0 <- numeric(length(ages0))
 
 ## Given an individual's age0 at time0, how many years has it been since entering the current age category? 
-time0[(ages0-4.5)>=0 & (ages0-4.5)<1.5] <- ages0[(ages0-4.5)>=0 & (ages0-4.5)<1.5]-4.5 
-time0[(ages0-8)>=0 & (ages0-8)<2] <- ages0[(ages0-8)>=0 & (ages0-8)<2]-8
+time0[(ages0-4.5)>=0 & (ages0-4.5)<5.5] <- ages0[(ages0-4.5)>=0 & (ages0-4.5)<5.5]-4.5 
 time0[(ages0-10)>=0] <- 0
 time0 <- time0[ages0>=4.5]
 ages0 <- ages0[ages0>=4.5]
@@ -376,7 +374,7 @@ weaningAge <- 4.5
 timeunit <- 1/12 ## in years. Each time step is 1 month.
 
 ## 1. Transition from I to C:
-IC <- function(t) ifelse(t<8, 0, 1) ## Probability for an immature to transition to adult is zero if t<8 and 1 if t>=8
+IC <- function(t) ifelse(t<5.5, 0, 1) ## Probability for an subadult to transition to adult is zero if time as subadult is t<5.5 and 1 if t>=5.5
 
 ## 2. Transition from C to P:
 alpha <- .99 ## Probability to be pregnant after 12 months being cycling
@@ -397,23 +395,23 @@ LC <- function(t) ifelse(t<weaningAge,0,1) ## Probability that a lactating femal
 deathRate <- function(age) 1-exp(log(1-datX[trunc(age+1),2])/(1/timeunit)) ## Death rate, per month, specified by the LM
 
 ## Function that specifies the status change of each agent in model : I,C,P,L,CD
-statusChange <- function(value, t, alpha){
-  if(value=="I"){
+statusChange <- function(status, t, alpha){
+  if(status =="I"){
     if(rbinom(1,1,IC(t))){
       return("C")
     } else return('I')
-  } else if (value=="C"){
+  } else if (status =="C"){
     if(rbinom(1,1,CP(t, alpha))){
       return("P")
     } else return('C')
-  } else if (value=="P") {
+  } else if (status =="P") {
     if(rbinom(1,1,PL(t))){
       return("L")
     } else return('P')
   } else if(!rbinom(1,1,LC(t))){		  ## If her infant doesn't get weaned because it is too young
-    if(!rbinom(1,1,LCdeathInf(t))) {	## If her infant doesn't die
-      return("L")						          ## Then the female is still lactating
-    } else return("CD")					      ## If her infant dies, female becomes "CD", i.e. she transitions to cycling after the death of her infant
+    if(!rbinom(1,1,LCdeathInf(t))) {	  ## If her infant doesn't die
+      return("L")						  ## Then the female is still lactating
+    } else return("CD")					  ## If her infant dies, female becomes "CD", i.e. she transitions to cycling after the death of her infant
   } else  return("C")
 }
 
@@ -429,35 +427,35 @@ statusChange <- function(value, t, alpha){
 timeunit <- 1/12
 alpha <- 0.99
 
-simTshia <- function(ages0 = c(5), status0 =c("I"), time0 = c(1.5), nyears=50, timeunit=1/12, alpha=0.99, verbose=T){
-  abmDataLog <- data.frame(timestep=0, ages=ages0, time=time0,status=status0,indiv=1:length(ages0), stringsAsFactors = FALSE)
+simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=0.99, verbose=T){
+  abmDataLog <- data.frame(timestep=0, ages=ages0, time=time0,status=status0, indiv=1:length(ages0), stringsAsFactors = FALSE)
   iter <- max(abmDataLog$indiv)+1
   for(i in 1:trunc(nyears/timeunit)){
     if(i%%(1/timeunit)==0 & verbose) print(paste("time =",i*timeunit))
     newAbmData <- abmDataLog[0,]
     abmData <- abmDataLog[abmDataLog$timestep==(i-1),]
-    #print(table(abmData[,4]))
     for(j in 1:nrow(abmData)){
-      currentStatus <- abmData[j,4]
+	  currentStatus <- abmData[j,4]
       newStatus <- statusChange(currentStatus, abmData[j,3], alpha=alpha)##returns "I", "P", "L", "C", or "CD"
+
       if(rbinom(1,1,deathRate(abmData[j,2]))==1){##did the individual just die?
         newStatus <- "D"
       }
       if(currentStatus!=newStatus) {
         newtime <- timeunit
+        if(newStatus=="L") infantSex <- sample(0:1,1)##0=Male, 1=Female
       } else {
         newtime <- abmData[j,3]+timeunit
       }
-      newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=abmData[j,2]+timeunit, time=newtime, status=newStatus,indiv=abmData[j,5], stringsAsFactors = FALSE))
-      if(currentStatus=="L" & newStatus=="C" & sample(0:1,1)) {
-        newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=4.5+timeunit, time=4.5+timeunit, status="I", indiv=iter, stringsAsFactors = FALSE))
+      newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=abmData[j,2]+timeunit, time=newtime, status=newStatus, indiv=abmData[j,5], stringsAsFactors = FALSE))
+      if(currentStatus=="L" & newStatus=="C" & infantSex==1) {##50/50 sex ratio
+        newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=weaningAge+timeunit, time=weaningAge+timeunit, status="I", indiv=iter, stringsAsFactors = FALSE))
         iter <- iter+1
       } ##if weaning, add new row to abmData
     }
-    if(sum(duplicated(newAbmData$indiv))>0) print(paste("duplicated: ",newAbmData$indiv[duplicated(newAbmData$indiv)]))
     if(sum(newAbmData$status=="CD")>0) newAbmData$status[newAbmData$status=="CD"] <- "C"
     if(nrow(newAbmData[newAbmData$status!="D",])==0) break
-    abmDataLog <- rbind(abmDataLog, newAbmData[newAbmData$status!="D",])
+    abmDataLog <- rbind(abmDataLog, newAbmData[newAbmData$status!="D",])   
   }
   return(abmDataLog)
 }
@@ -466,22 +464,29 @@ simTshia <- function(ages0 = c(5), status0 =c("I"), time0 = c(1.5), nyears=50, t
 ######################### STEP 5: RUN REINTRODUCTION SCENARIOS #########################
 ########################################################################################
 
-## Test scenario
 
 nyears <- 50
 timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(19), status0 =c("C"), time0 = time0, nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res[1:length(nindiv),i] <- nindiv
-}
-res
+nruns <-1
+alpha <- 0.42
+res <- data.frame(Year=numeric(0), nyears=numeric(0), nInf = numeric(0))
 
-write.csv(res, file=paste0(workingDir,"pva_ABM_50year/test.csv"), row.names=F)
+for(i in 1:nruns){
+  abmDataLog <- simTshia(ages0 = rep(10, 100), status0 =rep(c("C", "L"), c(20, 80)) , time0 = 0, nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=T)
+  abmDataLog2 <- abmDataLog[abmDataLog$ages>=10,]
+  for (j in unique(abmDataLog2$indiv)){
+  	temp <- abmDataLog2[abmDataLog2$indiv==j & abmDataLog2$timestep>(20/timeunit),"status"]
+  	nInf <- sum(((temp=="L")[-1]-(temp=="L")[-length(temp)])==1)
+  	nYearObs <- length(temp)*timeunit
+  	res <- rbind(res, data.frame(nyears= nYearObs, nInf = nInf))
+  } 
+}
+
+apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
+
+
+
+
 
 ## Scenarios A1-I1: Mountain gorilla
 ## Scenarios A2-I2: Western gorilla
@@ -493,16 +498,16 @@ write.csv(res, file=paste0(workingDir,"pva_ABM_50year/test.csv"), row.names=F)
 ## ages0 = c(19), status0 = c("C"), time0 = c(9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
 nyears <- 50
 timeunit <- 1/12
-nruns <-1000
-alpha=0.99
+nruns <-10
+alpha <- 0.99
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
 for(i in 1:nruns){
   print(i)
-  abmDataLog <- simTshia(ages0 = c(19), status0 =c("C"), time0 = c(11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
+  abmDataLog <- simTshia(ages0 = 19, status0 ="C", time0 = 0, nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
   nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
   res[1:length(nindiv),i] <- nindiv
 }
-res
+dim(res)
 
 write.csv(res, file=paste0(workingDir,"pva_ABM_50year/ScenarioA.csv"), row.names=F)
 
@@ -518,7 +523,7 @@ alpha=0.99
 res0 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
 for(i in 1:nruns){
   print(i)
-  abmDataLog <- simTshia(ages0 = c(5,19), status0 =c("I","C"), time0 = c(1.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
+  abmDataLog <- simTshia(ages0 = c(5,19), status0 =c("I","C"), time0 = c(.5, 0), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
   nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
   res0[1:length(nindiv),i] <- nindiv
 }
