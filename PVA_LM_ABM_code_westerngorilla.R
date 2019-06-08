@@ -46,7 +46,22 @@ dat <- read.csv(paste0(workingDir, "LifeTable_WLG_Breuer.csv"))
 
 ## Data from Bronikowski et al (2016) for mountain gorillas (MTN)
 ## Note the first age of reproduction is 8 years although the first birth is usually at 10 years old for mountain gorillas and the fertility rate varied for each adult year.
-dat1 <- read.csv(paste0(workingDir, "LifeTable_MTN_Bronikowski.csv"))
+datBron <- read.csv(paste0(workingDir, "LifeTable_MTN_Bronikowski.csv"))
+dat1 <- datBron
+dat1[,3] <- datBron[,3]*.643
+dat1[,3] <- datBron[,3]*.786
+
+## Transform MTN life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
+mat_mtn <- matrix(0, nrow=nrow(dat1), ncol=nrow(dat1)) ## create square matrix with 0s everywhere
+mat_mtn[1,] <- dat1[,3] ## first row in matrix assigned the fertility rates from the life table
+mat_mtn_2 <- matrix(0,ncol=ncol(mat_mtn)-1, nrow=ncol(mat_mtn)-1) 
+diag(mat_mtn_2) <- 1-dat1[-nrow(dat1),2] ## survival rates are assigned to just under the diagonal of a LM
+mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
+head(mat_mtn) ## View and check matrix
+#write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN.csv"), row.names=F)
+## Calculate the eigenvalue of the matrices
+eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
+Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.032567
 
 ## Transform WLG life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
 mat_wlg <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create square matrix with 0s everywhere
@@ -56,21 +71,11 @@ diag(mat2) <- 1-dat[-nrow(dat),2] ## survival rates are assigned to just under t
 mat_wlg[2:nrow(mat_wlg), 1:(ncol(mat_wlg)-1)] <- mat2
 head(mat_wlg) ## View and check matrix
 write.csv(mat_wlg, file=paste0(workingDir,"LeslieMatrix_WLG.csv"), row.names=F)
-
-## Transform MTN life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
-mat_mtn <- matrix(0, nrow=nrow(dat1), ncol=nrow(dat1)) ## create square matrix with 0s everywhere
-mat_mtn[1,] <- dat1[,3] ## first row in matrix assigned the fertility rates from the life table
-mat_mtn_2 <- matrix(0,ncol=ncol(mat_mtn)-1, nrow=ncol(mat_mtn)-1) 
-diag(mat_mtn_2) <- 1-dat1[-nrow(dat1),2] ## survival rates are assigned to just under the diagonal of a LM
-mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
-head(mat_mtn) ## View and check matrix
-write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN.csv"), row.names=F)
-
 ## Calculate the eigenvalue of the matrices
 eigenvalues_wlg <- eigen(mat_wlg, only.values=TRUE)
-eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
 Re(eigenvalues_wlg$values[1]) ## this is the dominant eigenvalue of the WLG LM, i.e. lambda = 1.020623
-Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.032567
+
+
 
 ## Let's create a demographic pyramid for WLG
 n <- rep(1, nrow(dat))
@@ -465,7 +470,7 @@ simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=0.99
 ########################################################################################
 
 
-nyears <- 50
+nyears <- 20
 timeunit <- 1/12
 nruns <-1
 alpha <- 0.42
@@ -475,7 +480,7 @@ for(i in 1:nruns){
   abmDataLog <- simTshia(ages0 = rep(10, 100), status0 =rep(c("C", "L"), c(20, 80)) , time0 = 0, nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=T)
   abmDataLog2 <- abmDataLog[abmDataLog$ages>=10,]
   for (j in unique(abmDataLog2$indiv)){
-  	temp <- abmDataLog2[abmDataLog2$indiv==j & abmDataLog2$timestep>(20/timeunit),"status"]
+  	temp <- abmDataLog2[abmDataLog2$indiv==j & abmDataLog2$timestep>(10/timeunit),"status"]
   	nInf <- sum(((temp=="L")[-1]-(temp=="L")[-length(temp)])==1)
   	nYearObs <- length(temp)*timeunit
   	res <- rbind(res, data.frame(nyears= nYearObs, nInf = nInf))
@@ -498,7 +503,7 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 ## ages0 = c(19), status0 = c("C"), time0 = c(9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
 nyears <- 50
 timeunit <- 1/12
-nruns <-10
+nruns <-100
 alpha <- 0.99
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
 for(i in 1:nruns){
