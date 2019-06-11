@@ -48,8 +48,8 @@ dat <- read.csv(paste0(workingDir, "LifeTable_WLG_Breuer.csv"))
 ## Note the first age of reproduction is 8 years although the first birth is usually at 10 years old for mountain gorillas and the fertility rate varied for each adult year.
 datBron <- read.csv(paste0(workingDir, "LifeTable_MTN_Bronikowski.csv"))
 dat1 <- datBron
-dat1[,3] <- datBron[,3]*.643
-dat1[,3] <- datBron[,3]*.786
+dat1$fertilityrate_1percent <- datBron[,3]*.643 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.01 which corresponds to a 1% growth rate
+dat1$fertilityrate_2percent <- datBron[,3]*.786 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.02 which corresponds to a 2% growth rate
 
 ## Transform MTN life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
 mat_mtn <- matrix(0, nrow=nrow(dat1), ncol=nrow(dat1)) ## create square matrix with 0s everywhere
@@ -63,6 +63,30 @@ head(mat_mtn) ## View and check matrix
 eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
 Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.032567
 
+## Transform MTN life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal) : USING GROWTH RATES OF 1%
+mat_mtn <- matrix(0, nrow=nrow(dat1), ncol=nrow(dat1)) ## create square matrix with 0s everywhere
+mat_mtn[1,] <- dat1[,4] ## first row in matrix assigned the fertility rates from the life table
+mat_mtn_2 <- matrix(0,ncol=ncol(mat_mtn)-1, nrow=ncol(mat_mtn)-1) 
+diag(mat_mtn_2) <- 1-dat1[-nrow(dat1),2] ## survival rates are assigned to just under the diagonal of a LM
+mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
+head(mat_mtn) ## View and check matrix
+#write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN_1percent.csv"), row.names=F)
+## Calculate the eigenvalue of the matrices
+eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
+Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.010051
+
+## Transform MTN life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal) : USING GROWTH RATES OF 2%
+mat_mtn <- matrix(0, nrow=nrow(dat1), ncol=nrow(dat1)) ## create square matrix with 0s everywhere
+mat_mtn[1,] <- dat1[,5] ## first row in matrix assigned the fertility rates from the life table
+mat_mtn_2 <- matrix(0,ncol=ncol(mat_mtn)-1, nrow=ncol(mat_mtn)-1) 
+diag(mat_mtn_2) <- 1-dat1[-nrow(dat1),2] ## survival rates are assigned to just under the diagonal of a LM
+mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
+head(mat_mtn) ## View and check matrix
+write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN_2percent.csv"), row.names=F)
+## Calculate the eigenvalue of the matrices
+eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
+Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.020043
+
 ## Transform WLG life table into a Leslie matrix (fertility rates are in the top row, survival rates are just under the diagonal)
 mat_wlg <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create square matrix with 0s everywhere
 mat_wlg[1,] <- dat[,3] ## first row in matrix assigned the fertility rates from the life table
@@ -74,8 +98,6 @@ write.csv(mat_wlg, file=paste0(workingDir,"LeslieMatrix_WLG.csv"), row.names=F)
 ## Calculate the eigenvalue of the matrices
 eigenvalues_wlg <- eigen(mat_wlg, only.values=TRUE)
 Re(eigenvalues_wlg$values[1]) ## this is the dominant eigenvalue of the WLG LM, i.e. lambda = 1.020623
-
-
 
 ## Let's create a demographic pyramid for WLG
 n <- rep(1, nrow(dat))
@@ -473,7 +495,7 @@ simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=0.99
 nyears <- 20
 timeunit <- 1/12
 nruns <-1
-alpha <- 0.42
+alpha <- 0.42 ## alpha = 0.42 for WLG
 res <- data.frame(Year=numeric(0), nyears=numeric(0), nInf = numeric(0))
 
 for(i in 1:nruns){
