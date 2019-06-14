@@ -521,6 +521,12 @@ for(i in 1:nruns){
 
 apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 
+## Now, let's apply the functions using each reintrodcution scenario. Load the appropriate csv file.
+ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv"))
+
+ReintroScenario_list <- list(ReA=ReintroScenario_IBM$ReA, ReB=ReintroScenario_IBM$ReB, ReC=ReintroScenario_IBM$ReC, ReD=ReintroScenario_IBM$ReD, ReE=ReintroScenario_IBM$ReE, ReF=ReintroScenario_IBM$ReF, ReG=ReintroScenario_IBM$ReG, ReH=ReintroScenario_IBM$ReH, ReI=ReintroScenario_IBM$ReI)
+ReintroScenario_list <- lapply(ReintroScenario_list, function(x) x[!is.na(x)])
+
 ## Scenarios A1-I1: Mountain gorilla
 ## Scenarios A2-I2: Western gorilla
 
