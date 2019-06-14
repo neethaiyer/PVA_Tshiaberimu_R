@@ -402,7 +402,7 @@ data.frame(ages0, time0, status0)
 
 ## A. Initial parameters: survivorship, fertility, and weaning age (MTN)
 datX <- dat1 ## from the LM loaded in Part 2
-weaningAge <- 4.5
+weaningAge <- 3.5
 
 ## B. Initial parameters: survivorship, fertility, and weaning age (WLG)
 #datX <- dat1 ## from the LM loaded in Part 2
@@ -500,7 +500,6 @@ simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alph
   return(abmDataLog)
 }
 
-simTshia(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alpha, verbose=T)
 ########################################################################################
 ######################### STEP 5: RUN REINTRODUCTION SCENARIOS #########################
 ########################################################################################
@@ -527,6 +526,7 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 ## Now, let's apply the functions using each reintrodcution scenario. Load the appropriate csv file.
 ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv"))
 
+## Create a list of these scenarios with the age of individuals introduced, and their status at the start of the model
 convertToList <- function(scenario, adultAge, weaningAge){
 	res <- list()
 	for(i in 1:ncol(scenario)){
@@ -536,213 +536,33 @@ convertToList <- function(scenario, adultAge, weaningAge){
 		times <- numeric(length(ages))
 		times <- ages-weaningAge
 		times[ages>=8] <- ages[ages>=8]-8
-		res[[i]] <- data.frame(ages0= ages, status0 =statuses, time0=times)
+		res[[i]] <- data.frame(ages0 = ages, status0 = statuses, time0 = times)
 	}
 	return(res)
 }
 
-convertToList(scenario= ReintroScenario_IBM, adultAge=8, weaningAge=3.5)
+###############################################################################
+#################### SET THE INITIAL CONDITIONS OF THE IBM ####################
+###############################################################################
 
+## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
+initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=8, weaningAge=3.5)
+nyears <- 10 ## Projection Period
+timeunit <- 1/12 ## timestep
+nruns <-10 ## Number of simulations to run
+alpha <- 0.99 ## function of the fertility rate
 
-ReintroScenario_list <- list(ReA = list(Ages=ReintroScenario_IBM$ReA, Status=NA), ReB = list(Ages=ReintroScenario_IBM$ReB,  Status=NA), ReC = list(Ages=ReintroScenario_IBM$ReC, Status=NA), ReD = list(Ages=ReintroScenario_IBM$ReD, Status=NA), ReE = list(Ages=ReintroScenario_IBM$ReE, Status=NA), ReF = list(Ages=ReintroScenario_IBM$ReF, Status=NA), ReG = list(Ages=ReintroScenario_IBM$ReG, Status=NA), ReH = list(Ages=ReintroScenario_IBM$ReH, Status=NA), ReI = list(Ages=ReintroScenario_IBM$ReI, Status=NA)) ## create a list of these scenarios since columns are of different lengths
-
-
-
-for(i in 1:length(ReintroScenario_list)){
-  for(j in 1:length(ReintroScenario_list[[i]][j])){
-    if(ReintroScenario_list[[1]][[2]][1] < 8) {
-      ReintroScenario_list[[1]][[2]][1] <- "I" 
-    } else {
-      ReintroScenario_list[[1]][[2]][1] <- "C"
-    }
-  }
-}
-
-
-ReintroScenario_list <- lapply(ReintroScenario_list, function(x) x[!is.na(x)]) ## remove NAs
-
-## Scenarios A1-I1: Mountain gorilla
-## Scenarios A2-I2: Western gorilla
-
-## Scenario A
-## Scenario A1: one individual (adult female 19 years old, no reintroduced females added to the population)
-## ages0 = c(19), status0 = c("C"), time0 = c(11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario A2: one individual (adult female 19 years old, no reintroduced females added to the population)
-## ages0 = c(19), status0 = c("C"), time0 = c(9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-100
-alpha <- 0.99
+## Apply the IBM function to each scenario:
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = 19, status0 ="C", time0 = 0, nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res[1:length(nindiv),i] <- nindiv
+for(j in 1:length(startingConditions)){
+  for(i in 1:nruns){
+    print(i)
+    abmDataLog <- simTshia(ages0 = initalConditions[[j]][,1], status0 = initalConditions[[j]][,2], time0 = initalConditions[[j]][,3], nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
+    nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
+    res[1:length(nindiv),i] <- nindiv
+  }
+  write.csv(res, file=paste0(workingDir,"pva_IBM_50year/Scenario", j,".csv"), row.names=F)
 }
-dim(res)
-
-write.csv(res, file=paste0(workingDir,"pva_ABM_50year/ScenarioA.csv"), row.names=F)
-
-## Scenario B
-## Scenario B1: two individuals (adult female 19 years old, juvenile is a female, no reintroduced females added to the population)
-## ages0 = c(5,19), status0 =c("I","C"), time0 = c(1.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario B2: two individual (adult female 19 years old, no reintroduced females added to the population)
-## ages0 = c(5,19), status0 = c("I","C"), time0 = c(0.5, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res0 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(5,19), status0 =c("I","C"), time0 = c(.5, 0), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res0[1:length(nindiv),i] <- nindiv
-}
-res0
-
-write.csv(res0, file=paste0(workingDir,"pva_ABM_50year/ScenarioB.csv"), row.names=F)
-
-## Scenario C
-## Scenario C1: three individuals (adult female 19 years old, 2 reintroduced females added to the population)
-## ages0 = c(7,7,19), status0 = c("I","I","C"), time0 = c(3.5, 3.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario C2: three individuals (adult female 19 years old, 2 reintroduced females added to the population)
-## ages0 = c(7,7,19), status0 = c("I","I","C"), time0 = c(2.5, 2.5, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res1 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(7,7,19), status0 = c("I","I","C"), time0 = c(3.5, 3.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res1[1:length(nindiv),i] <- nindiv
-}
-res1
-
-write.csv(res1, file=paste0(workingDir,"pva_ABM_50year/ScenarioC.csv"), row.names=F)
-
-## Scenario D
-## Scenario D1: four individuals (adult female 19 years old, 3 reintroduced females added to the population)
-## ages0 = c(7,7,8,19), status0 = c("I","I","I","C"), time0 = c(3.5, 3.5, 4.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario D2: four individuals (adult female 19 years old, 3 reintroduced females added to the population)
-## ages0 = c(7,7,8,19), status0 = c("I","I","I","C"), time0 = c(2.5, 2.5, 3.5, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res2 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(7,7,8,19), status0 = c("I","I","I","C"), time0 = c(3.5, 3.5, 4.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res2[1:length(nindiv),i] <- nindiv
-}
-res2
-
-write.csv(res2, file=paste0(workingDir,"pva_ABM_50year/ScenarioD.csv"), row.names=F)
-
-## Scenario E
-## Scenario E1: five individuals (adult female 19 years old, 4 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,19), status0 =c("I","I","I","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario E2: five individuals (adult female 19 years old, 4 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,19), status0 =c("I","I","I","C","C"), time0 = c(2.5, 2.5, 3.5, 4.5, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res3 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(7,7,8,9,19), status0 =c("I","I","I","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res3[1:length(nindiv),i] <- nindiv
-}
-res3
-
-write.csv(res3, file=paste0(workingDir,"pva_ABM_50year/ScenarioE.csv"), row.names=F)
-
-## Scenario F
-## Scenario F1: six individuals (adult female 19 years old, 5 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,19), status0 =c("I","I","I","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario F2: six individuals (adult female 19 years old, 5 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,19), status0 =c("I","I","I","C","C","C"), time0 = c(2.5, 2.5, 3.5, 4.5, 2, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res4 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(7,7,8,9,12,19), status0 =c("I","I","I","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res4[1:length(nindiv),i] <- nindiv
-}
-res4
-
-write.csv(res4, file=paste0(workingDir,"pva_ABM_50year/ScenarioF.csv"), row.names=F)
-
-## Scenario G
-## Scenario G1: seven individuals (adult female 19 years old, 6 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,12,19), status0 =c("I","I","I","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 4, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario G2: seven individuals (adult female 19 years old, 6 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,12,19), status0 =c("I","I","I","C","C","C","C"), time0 = c(2.5, 2.5, 3.5, 4.5, 2, 2, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res5 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(7,7,8,9,12,12,19), status0 =c("I","I","I","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 4, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res5[1:length(nindiv),i] <- nindiv
-}
-res5
-
-write.csv(res5, file=paste0(workingDir,"pva_ABM_50year/ScenarioG.csv"), row.names=F)
-
-## Scenario H
-## Scenario H1: eight individuals (adult female 19 years old, 7 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,12,17,19), status0 =c("I","I","I","C","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 4, 9, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario H2: eight individuals (adult female 19 years old, 7 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,12,17,19), status0 =c("I","I","I","C","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 2, 2, 7, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res6 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(7,7,8,9,12,12,17,19), status0 =c("I","I","I","C","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 4, 9, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res6[1:length(nindiv),i] <- nindiv
-}
-res6
-
-write.csv(res6, file=paste0(workingDir,"pva_ABM_50year/ScenarioH.csv"), row.names=F)
-
-## Scenario I
-## Scenario I1: nine individuals (adult female 19 years old, 8 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,12,17,17,19), status0 =c("I","I","I","C","C","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 4, 9, 9, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-## Scenario I2: nine individuals (adult female 19 years old, 8 reintroduced females added to the population)
-## ages0 = c(7,7,8,9,12,12,17,17,19), status0 =c("I","I","I","C","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 2, 2, 7, 7, 9), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F
-nyears <- 50
-timeunit <- 1/12
-nruns <-1000
-alpha=0.99
-res7 <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
-for(i in 1:nruns){
-  print(i)
-  abmDataLog <- simTshia(ages0 = c(7,7,8,9,12,12,17,17,19), status0 =c("I","I","I","C","C","C","C","C","C"), time0 = c(3.5, 3.5, 4.5, 5.5, 4, 4, 9, 9, 11), nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
-  nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
-  res7[1:length(nindiv),i] <- nindiv
-}
-res7
-
-write.csv(res7, file=paste0(workingDir,"pva_ABM_50year/ScenarioI.csv"), row.names=F)
 
 ########################################################################################
 ################# STEP 6: EXAMINE DATA FROM REINTRODUCTION SCENARIOS ###################
