@@ -524,8 +524,19 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 ## Now, let's apply the functions using each reintrodcution scenario. Load the appropriate csv file.
 ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv"))
 
-ReintroScenario_list <- list(ReA=ReintroScenario_IBM$ReA, ReB=ReintroScenario_IBM$ReB, ReC=ReintroScenario_IBM$ReC, ReD=ReintroScenario_IBM$ReD, ReE=ReintroScenario_IBM$ReE, ReF=ReintroScenario_IBM$ReF, ReG=ReintroScenario_IBM$ReG, ReH=ReintroScenario_IBM$ReH, ReI=ReintroScenario_IBM$ReI)
-ReintroScenario_list <- lapply(ReintroScenario_list, function(x) x[!is.na(x)])
+ReintroScenario_list <- list(ReA = list(Ages=ReintroScenario_IBM$ReA, Status=NA), ReB = list(Ages=ReintroScenario_IBM$ReB,  Status=NA), ReC = list(Ages=ReintroScenario_IBM$ReC, Status=NA), ReD = list(Ages=ReintroScenario_IBM$ReD, Status=NA), ReE = list(Ages=ReintroScenario_IBM$ReE, Status=NA), ReF = list(Ages=ReintroScenario_IBM$ReF, Status=NA), ReG = list(Ages=ReintroScenario_IBM$ReG, Status=NA), ReH = list(Ages=ReintroScenario_IBM$ReH, Status=NA), ReI = list(Ages=ReintroScenario_IBM$ReI, Status=NA)) ## create a list of these scenarios since columns are of different lengths
+for(i in 1:length(ReintroScenario_list)){
+  for(j in 1:length(ReintroScenario_list[[i]][j])){
+    if(ReintroScenario_list[[1]][[2]][1] < 8) {
+      ReintroScenario_list[[1]][[2]][1] <- "I" 
+    } else {
+      ReintroScenario_list[[1]][[2]][1] <- "C"
+    }
+  }
+}
+
+
+ReintroScenario_list <- lapply(ReintroScenario_list, function(x) x[!is.na(x)]) ## remove NAs
 
 ## Scenarios A1-I1: Mountain gorilla
 ## Scenarios A2-I2: Western gorilla
