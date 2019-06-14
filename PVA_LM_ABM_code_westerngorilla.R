@@ -473,7 +473,7 @@ simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alph
     if(i%%(1/timeunit)==0 & verbose) print(paste("time =",i*timeunit)) ## %% or modulo find the remainder: every year, when you divide 1 by 12 %% = 0, so this keeps track of time in the simulation. if we select verbose=F, the time is not printed. 
     newAbmData <- abmDataLog[0,]
     abmData <- abmDataLog[abmDataLog$timestep==(i-1),] ## abmData keeps tracks of data from previous timestep
-    for(j in 1:nrow(abmData)){ ## j is the individual in the model
+    for(j in 1:nrow(abmData)){ ## j is the focal individual
 	  currentStatus <- abmData[j,4] ## this is the status of the individual j
       newStatus <- statusChange(currentStatus, abmData[j,3], alpha=alpha) ## Returns "I", "P", "L", "C", or "CD" and newStatus is the status at the next time step
       if(rbinom(1,1,deathRate(abmData[j,2]))==1){ ## Did the individual just die?
@@ -486,9 +486,11 @@ simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alph
         newtime <- abmData[j,3]+timeunit
       }
       newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=abmData[j,2]+timeunit, time=newtime, status=newStatus, indiv=abmData[j,5], stringsAsFactors = FALSE))
-      if(currentStatus=="L" & newStatus=="C" & infantSex==1) { ## 50/50 sex ratio
+      if(currentStatus=="L" & newStatus=="C"){ ## 50/50 sex ratio
+         if( infantSex==1) {
         newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=weaningAge+timeunit, time=weaningAge+timeunit, status="I", indiv=iter, stringsAsFactors = FALSE))
         iter <- iter+1
+        }
       } ## If weaning, add new row to abmData
     }
     if(sum(newAbmData$status=="CD")>0) newAbmData$status[newAbmData$status=="CD"] <- "C"
@@ -498,6 +500,7 @@ simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alph
   return(abmDataLog)
 }
 
+simTshia(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alpha, verbose=T)
 ########################################################################################
 ######################### STEP 5: RUN REINTRODUCTION SCENARIOS #########################
 ########################################################################################
@@ -524,7 +527,27 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 ## Now, let's apply the functions using each reintrodcution scenario. Load the appropriate csv file.
 ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv"))
 
+convertToList <- function(scenario, adultAge, weaningAge){
+	res <- list()
+	for(i in 1:ncol(scenario)){
+		ages <- c(na.omit(scenario[,i]))
+		ages <- ages[ages>= weaningAge]
+		statuses <- ifelse(ages<adultAge, "I", "C")
+		times <- numeric(length(ages))
+		times <- ages-weaningAge
+		times[ages>=8] <- ages[ages>=8]-8
+		res[[i]] <- data.frame(ages0= ages, status0 =statuses, time0=times)
+	}
+	return(res)
+}
+
+convertToList(scenario= ReintroScenario_IBM, adultAge=8, weaningAge=3.5)
+
+
 ReintroScenario_list <- list(ReA = list(Ages=ReintroScenario_IBM$ReA, Status=NA), ReB = list(Ages=ReintroScenario_IBM$ReB,  Status=NA), ReC = list(Ages=ReintroScenario_IBM$ReC, Status=NA), ReD = list(Ages=ReintroScenario_IBM$ReD, Status=NA), ReE = list(Ages=ReintroScenario_IBM$ReE, Status=NA), ReF = list(Ages=ReintroScenario_IBM$ReF, Status=NA), ReG = list(Ages=ReintroScenario_IBM$ReG, Status=NA), ReH = list(Ages=ReintroScenario_IBM$ReH, Status=NA), ReI = list(Ages=ReintroScenario_IBM$ReI, Status=NA)) ## create a list of these scenarios since columns are of different lengths
+
+
+
 for(i in 1:length(ReintroScenario_list)){
   for(j in 1:length(ReintroScenario_list[[i]][j])){
     if(ReintroScenario_list[[1]][[2]][1] < 8) {
