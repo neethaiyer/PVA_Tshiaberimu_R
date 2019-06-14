@@ -70,6 +70,7 @@ mat_mtn_2 <- matrix(0,ncol=ncol(mat_mtn)-1, nrow=ncol(mat_mtn)-1)
 diag(mat_mtn_2) <- 1-dat1[-nrow(dat1),2] ## survival rates are assigned to just under the diagonal of a LM
 mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
 head(mat_mtn) ## View and check matrix
+mat_mtn_1per <- mat_mtn
 #write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN_1percent.csv"), row.names=F)
 ## Calculate the eigenvalue of the matrices
 eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
@@ -82,7 +83,8 @@ mat_mtn_2 <- matrix(0,ncol=ncol(mat_mtn)-1, nrow=ncol(mat_mtn)-1)
 diag(mat_mtn_2) <- 1-dat1[-nrow(dat1),2] ## survival rates are assigned to just under the diagonal of a LM
 mat_mtn[2:nrow(mat_mtn), 1:(ncol(mat_mtn)-1)] <- mat_mtn_2
 head(mat_mtn) ## View and check matrix
-write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN_2percent.csv"), row.names=F)
+mat_mtn_2per <- mat_mtn
+##write.csv(mat_mtn, file=paste0(workingDir,"LeslieMatrix_MTN_2percent.csv"), row.names=F)
 ## Calculate the eigenvalue of the matrices
 eigenvalues_mtn <- eigen(mat_mtn, only.values=TRUE)
 Re(eigenvalues_mtn$values[1]) ## this is the dominant eigenvalue of the MTN LM, i.e. lambda = 1.020043
@@ -97,7 +99,7 @@ head(mat_wlg) ## View and check matrix
 write.csv(mat_wlg, file=paste0(workingDir,"LeslieMatrix_WLG.csv"), row.names=F)
 ## Calculate the eigenvalue of the matrices
 eigenvalues_wlg <- eigen(mat_wlg, only.values=TRUE)
-Re(eigenvalues_wlg$values[1]) ## this is the dominant eigenvalue of the WLG LM, i.e. lambda = 1.020623
+Re(eigenvalues_wlg$values[1]) ## this is the dominant eigenvalue of the WLG LM, i.e. lambda = 1.020623 vs. updated labmda = 0.9994444
 
 ## Let's create a demographic pyramid for WLG
 n <- rep(1, nrow(dat))
@@ -176,7 +178,7 @@ legend(15, 1, legend=c("Western Gorillas", "Mountain Gorillas"),
 ## 3. Probability of extinction for each scenario was calculated as the total proportion of simulations that resulted in a final population size of 0 females. 
 
 ## The function below returns the deterministic LM population size projection, using the projection period (tfinal), age and number of females in the starting population (No) and Leslie matrix (LM). 
-mat <- mat_wlg ## make sure you choose either the WLG or MTN LM (mat or mat_mtn respectively)
+mat <- mat_wlg ## make sure you choose either the WLG or MTN LM (mat_wlg or mat_mtn or mat_mtn_1per or mat_mtn_2per respectively)
 #mat <- mat_wlg
 pop_projection <- function(tfinal, LM=mat, No=No){
   pop <- N <- No
@@ -230,13 +232,15 @@ for(i in 1:nruns) {
   tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_I),2,sum)
 }
 
-for(j in 2:ncol(ReintroScenario)){
+  ## stil working here ##
+##for(j in 2:ncol(ReintroScenario)){
   No <- ReintroScenario[,j]
   scenario <- strsplit(colnames(ReintroScenario)[j], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
   for(i in 1:nruns){
   assign(paste0("temp", scenario), apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum))
   }
-}
+##}
+  ## stil working here ##
 
 ## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
 prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]), 
@@ -264,6 +268,10 @@ prob_50years[index,2:6] <- c(probNe_150, probNe_100, probNe_50, probNe_40, probE
 write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"), row.names=F)
 ## MTN values
 write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"), row.names=F)
+## MTN values 1%
+write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"), row.names=F)
+## MTN values 2%
+write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"), row.names=F)
 
 ################################################################################################
 ###################################### PLOTS for LM ############################################
@@ -275,6 +283,8 @@ write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"
 ## Let's plot lambda and extinction probabilities. Use the correct dataframe for either WLG or MTN:
 prob_50years_wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
 prob_50years_mtn_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"))
+prob_50years_mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"))
+prob_50years_mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"))
 
 ################################################################################################
 ################################ Plots of extinction probability  ##############################
@@ -289,8 +299,10 @@ axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
 title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
 lines(prob_50years_wlg_lm$scenario, prob_50years_wlg_lm$prob_Extn, bg="coral", type="b", pch=21)
 lines(prob_50years_mtn_lm$scenario, prob_50years_mtn_lm$prob_Extn, bg="azure4", type="b", pch=24)
-legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas"),
-       pt.bg=c("coral", "azure4"), lty=c(1,1), text.font=2, pch=c(21,24))
+lines(prob_50years_mtn_1per_lm$scenario, prob_50years_mtn_1per_lm$prob_Extn, bg="dodgerblue", type="b", pch=22)
+lines(prob_50years_mtn_2per_lm$scenario, prob_50years_mtn_2per_lm$prob_Extn, bg="yellow", type="b", pch=23)
+legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas", "1 percent growth", "2 percent growth"),
+       pt.bg=c("coral", "azure4","dodgerblue","yellow"), lty=c(1,1,1,1), text.font=2, pch=c(21,24,22,23))
 
 ################################################################################################
 ########################### Plots of 1000 simulations for each Scenario ########################
@@ -341,7 +353,7 @@ lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for
 ########################################################################################
 
 ages0 <- numeric(0) ## we need a vector that keeps track of the age of individuals
-ages0 <- rep(1:length(n), rmultinom(1,100,prob=n)) ## We start with 100 individuals. rmultinom creates a vector that assigns the number of individuals (in this case 100) to each age, according to the LM demography
+ages0 <- rep(1:length(n_mtn), rmultinom(1,100,prob=n_mtn)) ## We start with 100 individuals. rmultinom creates a vector that assigns the number of individuals (in this case 100) to each age, according to the LM demography (n or n_mtn)
 hist(ages0)
 
 ## A. Parameters for optimistic model (MTN)
@@ -389,7 +401,7 @@ data.frame(ages0, time0, status0)
 ## Next, we specifiy the transition probabilities, in relation to time since entry in the "current" category
 
 ## A. Initial parameters: survivorship, fertility, and weaning age (MTN)
-datX <- dat ## from the LM loaded in Part 2
+datX <- dat1 ## from the LM loaded in Part 2
 weaningAge <- 4.5
 
 ## B. Initial parameters: survivorship, fertility, and weaning age (WLG)
@@ -454,7 +466,7 @@ statusChange <- function(status, t, alpha){
 timeunit <- 1/12
 alpha <- 0.99
 
-simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=0.99, verbose=T){
+simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alpha, verbose=T){
   abmDataLog <- data.frame(timestep=0, ages=ages0, time=time0,status=status0, indiv=1:length(ages0), stringsAsFactors = FALSE)
   iter <- max(abmDataLog$indiv)+1
   for(i in 1:trunc(nyears/timeunit)){
@@ -491,11 +503,10 @@ simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=0.99
 ######################### STEP 5: RUN REINTRODUCTION SCENARIOS #########################
 ########################################################################################
 
-
 nyears <- 20
 timeunit <- 1/12
 nruns <-1
-alpha <- 0.42 ## alpha = 0.42 for WLG
+alpha <- 0.85 ## alpha = 0.42 for WLG
 res <- data.frame(Year=numeric(0), nyears=numeric(0), nInf = numeric(0))
 
 for(i in 1:nruns){
@@ -510,10 +521,6 @@ for(i in 1:nruns){
 }
 
 apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
-
-
-
-
 
 ## Scenarios A1-I1: Mountain gorilla
 ## Scenarios A2-I2: Western gorilla
