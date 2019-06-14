@@ -450,7 +450,7 @@ statusChange <- function(status, t, alpha){
   } else if(!rbinom(1,1,LC(t))){		  ## If her infant doesn't get weaned because it is too young
     if(!rbinom(1,1,LCdeathInf(t))) {	  ## If her infant doesn't die
       return("L")						  ## Then the female is still lactating
-    } else return("CD")					  ## If her infant dies, female becomes "CD", i.e. she transitions to cycling after the death of her infant
+    } else return("CD")					  ## If her infant dies, female becomes "CD", i.e. she transitions to cycling after the death of her infant. We distinguish between CD and C because if the baby dies, we do not add it into the population in the next year
   } else  return("C")
 }
 
@@ -464,37 +464,36 @@ statusChange <- function(status, t, alpha){
 ########################################################################################
 
 timeunit <- 1/12
-alpha <- 0.99
+alpha <- 0.85
 
 simTshia <- function(ages0, status0, time0, nyears=50, timeunit=1/12, alpha=alpha, verbose=T){
-  abmDataLog <- data.frame(timestep=0, ages=ages0, time=time0,status=status0, indiv=1:length(ages0), stringsAsFactors = FALSE)
-  iter <- max(abmDataLog$indiv)+1
+  abmDataLog <- data.frame(timestep=0, ages=ages0, time=time0, status=status0, indiv=1:length(ages0), stringsAsFactors = FALSE)
+  iter <- max(abmDataLog$indiv)+1 ## iter keeps track of the index of the last row (of abmDataLog) + 1, which is essentially the next available gorilla "ID" in the model. We don't want to repeat ID's. 
   for(i in 1:trunc(nyears/timeunit)){
-    if(i%%(1/timeunit)==0 & verbose) print(paste("time =",i*timeunit))
+    if(i%%(1/timeunit)==0 & verbose) print(paste("time =",i*timeunit)) ## %% or modulo find the remainder: every year, when you divide 1 by 12 %% = 0, so this keeps track of time in the simulation. if we select verbose=F, the time is not printed. 
     newAbmData <- abmDataLog[0,]
-    abmData <- abmDataLog[abmDataLog$timestep==(i-1),]
-    for(j in 1:nrow(abmData)){
-	  currentStatus <- abmData[j,4]
-      newStatus <- statusChange(currentStatus, abmData[j,3], alpha=alpha)##returns "I", "P", "L", "C", or "CD"
-
-      if(rbinom(1,1,deathRate(abmData[j,2]))==1){##did the individual just die?
+    abmData <- abmDataLog[abmDataLog$timestep==(i-1),] ## abmData keeps tracks of data from previous timestep
+    for(j in 1:nrow(abmData)){ ## j is the individual in the model
+	  currentStatus <- abmData[j,4] ## this is the status of the individual j
+      newStatus <- statusChange(currentStatus, abmData[j,3], alpha=alpha) ## Returns "I", "P", "L", "C", or "CD" and newStatus is the status at the next time step
+      if(rbinom(1,1,deathRate(abmData[j,2]))==1){ ## Did the individual just die?
         newStatus <- "D"
       }
       if(currentStatus!=newStatus) {
-        newtime <- timeunit
-        if(newStatus=="L") infantSex <- sample(0:1,1)##0=Male, 1=Female
+        newtime <- timeunit ## this will depend on the newStatus
+        if(newStatus=="L") infantSex <- sample(0:1,1) ## this keeps track of sex, using sex ratio 1:1, where 0=Male, 1=Female
       } else {
         newtime <- abmData[j,3]+timeunit
       }
       newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=abmData[j,2]+timeunit, time=newtime, status=newStatus, indiv=abmData[j,5], stringsAsFactors = FALSE))
-      if(currentStatus=="L" & newStatus=="C" & infantSex==1) {##50/50 sex ratio
+      if(currentStatus=="L" & newStatus=="C" & infantSex==1) { ## 50/50 sex ratio
         newAbmData <- rbind(newAbmData, data.frame(timestep=i, ages=weaningAge+timeunit, time=weaningAge+timeunit, status="I", indiv=iter, stringsAsFactors = FALSE))
         iter <- iter+1
-      } ##if weaning, add new row to abmData
+      } ## If weaning, add new row to abmData
     }
     if(sum(newAbmData$status=="CD")>0) newAbmData$status[newAbmData$status=="CD"] <- "C"
-    if(nrow(newAbmData[newAbmData$status!="D",])==0) break
-    abmDataLog <- rbind(abmDataLog, newAbmData[newAbmData$status!="D",])   
+    if(nrow(newAbmData[newAbmData$status!="D",])==0) break ## if the adult female died, newAbmData should have 1 row with status D, and the juvenile gets weaned, so we keep the baby in the next time step. 
+    abmDataLog <- rbind(abmDataLog, newAbmData[newAbmData$status!="D",]) ## if there are individuals that are not dead then add them to the newAbmData
   }
   return(abmDataLog)
 }
