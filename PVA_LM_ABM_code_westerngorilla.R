@@ -232,16 +232,6 @@ for(i in 1:nruns) {
   tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_I),2,sum)
 }
 
-  ## stil working here ##
-##for(j in 2:ncol(ReintroScenario)){
-  No <- ReintroScenario[,j]
-  scenario <- strsplit(colnames(ReintroScenario)[j], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
-  for(i in 1:nruns){
-  assign(paste0("temp", scenario), apply(stoch_projection(tfinal=nyears, LM=mat, No=No),2,sum))
-  }
-##}
-  ## stil working here ##
-
 ## What is probability that simulation results in extinction at the end of 50 years? What is the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
 prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]), 
                            prob_150 =  NA, 
@@ -340,7 +330,7 @@ lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for
 }
 
 ########################################################################################
-############################ PART 3: Individual-based model (IBM) ############################
+############################ PART 3: Individual-based model (IBM) ######################
 ########################################################################################
 
 ## For this model, we specified 5 categories of individuals: 
