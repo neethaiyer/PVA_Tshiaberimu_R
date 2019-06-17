@@ -24,6 +24,12 @@ matMTN2 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_2%.csv"))
 matMTN1 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_1%.csv"))
 matWLG <- read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))
 
+## Let's plot lambda and extinction probabilities:
+prob_50years_wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
+prob_50years_mtn_3per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"))
+prob_50years_mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"))
+prob_50years_mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"))
+
 ########################################
 ######## DEMOGRAPHIC PYRAMIDS ##########
 ########################################
@@ -51,6 +57,24 @@ legend("bottom", legend=c("Mountain Gorillas", "Western Lowland Gorillas"),
 
 # xpd = TRUE tells R that it is OK to plot outside the region 
 # inset = c(x,y) tells R how to move the legend relative to the 'bottom' location
+
+#########################################
+##### EXTINCTION PROBABILITY PLOTS  #####
+#########################################
+
+plot.new()
+par(mfrow=c(1,1), mar=c(5.1,4.1,4.1,5.1))
+plot.window(xlim=c(1,9), ylim=c(0,100))
+axis(1, 1:9, LETTERS[1:9])
+axis(2)
+axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
+title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
+lines(prob_50years_wlg_lm$scenario, prob_50years_wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
+lines(prob_50years_mtn_1per_lm$scenario, prob_50years_mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
+lines(prob_50years_mtn_2per_lm$scenario, prob_50years_mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
+lines(prob_50years_mtn_3per_lm$scenario, prob_50years_mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
+legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
+       pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=2, pch=c(21,22,23,24))
 
 ########################################
 #### LESLIE MATRIX PROJECTION PLOTS ####

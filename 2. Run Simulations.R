@@ -5,21 +5,6 @@ workingDir <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/"
 source("1. Function Definition.R")
 
 #####################################################################################
-############################## LOAD ALL CSV FILES ###################################
-#####################################################################################
-
-## Mountain gorilla (MTN) life history parameters taken from Bronikowski et al (2016)
-## Western lowland gorilla (WLG) life history parameters taken from Breuer et al (2010), Breuer (2008) 
-dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv"))
-dat$fertilityrate_2percent <- dat[,3]*.786 
-## fertility rates multiplied by factor less than 1 to get eigen values of 1.01 which corresponds to a 1% growth rate
-dat$fertilityrate_1percent <- dat[,3]*.643 
-## fertility rates multiplied by factor less than 1 to get eigen values of 1.02 which corresponds to a 2% growth rate
-
-## Reintroduction Scenarios for LM
-ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv"))
-
-#####################################################################################
 ##################### PART 1: Leslie Matrix model (Simple PVA) ######################
 #####################################################################################
 
@@ -30,81 +15,25 @@ ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv")
 ## D. Western lowland gorillas with constant fertility rates (due to limited data)
 ## Age of first reproduction = 8 years (for MTN) and 10 years (for WLG)
 
-########################################################################################
-#################### STEP 1: CREATE LESLIE MATRICES FROM LIFE TABLES ###################
-########################################################################################
+###############################################################################
+#################### SET THE INITIAL CONDITIONS OF THE LM #####################
+###############################################################################
 
-## A. Create the Leslie Matrix for MTN with fertility rates that correspond to 3% growth rate
-mat <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create an empty square matrix
-mat[1,] <- dat[,3] ## first row in matrix assigned the fertility rates from the life table
-mat2 <- matrix(0,ncol=ncol(mat)-1, nrow=ncol(mat)-1) 
-diag(mat2) <- 1-dat[-nrow(dat),2] ## survival rates are assigned to just under the diagonal of a LM
-mat[2:nrow(mat), 1:(ncol(mat)-1)] <- mat2
-write.csv(mat, file=paste0(workingDir,"LeslieMatrix_MTN_3%.csv"), row.names=F)
+## Reintroduction Scenarios for LM
+ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv"))
 
-## B. Create the Leslie Matrix for MTN with fertility rates that correspond to 2% growth rate
-mat <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create an empty square matrix
-mat[1,] <- dat[,6] ## first row in matrix assigned the fertility rates from the life table
-mat2 <- matrix(0,ncol=ncol(mat)-1, nrow=ncol(mat)-1) 
-diag(mat2) <- 1-dat[-nrow(dat),2] ## survival rates are assigned to just under the diagonal of a LM
-mat[2:nrow(mat), 1:(ncol(mat)-1)] <- mat2
-write.csv(mat, file=paste0(workingDir,"LeslieMatrix_MTN_2%.csv"), row.names=F)
-
-## C. Create the Leslie Matrix for MTN with fertility rates that correspond to 1% growth rate
-mat <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create an empty square matrix
-mat[1,] <- dat[,7] ## first row in matrix assigned the fertility rates from the life table
-mat2 <- matrix(0,ncol=ncol(mat)-1, nrow=ncol(mat)-1) 
-diag(mat2) <- 1-dat[-nrow(dat),2] ## survival rates are assigned to just under the diagonal of a LM
-mat[2:nrow(mat), 1:(ncol(mat)-1)] <- mat2
-write.csv(mat, file=paste0(workingDir,"LeslieMatrix_MTN_1%.csv"), row.names=F)
-
-## D. Create the Leslie Matrix for WLG with constant fertility rates
-mat <- matrix(0, nrow=nrow(dat), ncol=nrow(dat)) ## create an empty square matrix
-mat[1,] <- dat[,5] ## first row in matrix assigned the fertility rates from the life table
-mat2 <- matrix(0,ncol=ncol(mat)-1, nrow=ncol(mat)-1) 
-diag(mat2) <- 1-dat[-nrow(dat),4] ## survival rates are assigned to just under the diagonal of a LM
-mat[2:nrow(mat), 1:(ncol(mat)-1)] <- mat2
-write.csv(mat, file=paste0(workingDir,"LeslieMatrix_WLG.csv"), row.names=F)
-
-########################################################################################
-########################## STEP 2: CREATE DEMOGRAPHIC PYRAMIDS #########################
-########################################################################################
-
-## A. Demographic pyramid for MTN (same for 3%, 2%, and 1%)
-n <- rep(1, nrow(dat))
-n[1] <- 1
-for (i in 2:length(n)){
-  n[i] <- prod(1-dat[1:(i-1),2])
-} ## Make sure sum equals 1 to generate pyramid
-n_mtn <- n/(sum(n))
-## for the cumulative survival curve:
-n_mtnCS <- n/n[1]
-
-## D. Demographic pyramid for WLG
-n <- rep(1, nrow(dat))
-n[1] <- 1
-for (i in 2:length(n)){
-  n[i] <- prod(1-dat[1:(i-1),4])
-} ## Make sure sum equals 1 to generate pyramid
-n_wlg <- n/(sum(n))
-## for the cumulative survival curve:
-n_wlgCS <- n/n[1]
-
-########################################################################################
-######################### STEP 2: RUN LESLIE MATRIX SIMULATIONS ########################
-########################################################################################
-
-##############################################
-########### SET INITIAL CONDITIONS ###########
-##############################################
-
-nyears <- 50 ## projection period
-nruns <- 1000 ## number of simulations of the model
+nyears <- 50 ## Projection Period
+nruns <- 1000 ## Number of simulations to run
 ## Leslie Matrices
 matMTN3 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_3%.csv"))
 matMTN2 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_2%.csv"))
 matMTN1 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_1%.csv"))
 matWLG <- read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))
+mat <- matWLG ## Select the appropriate matrix
+
+###############################################################################
+############################# RUN THE LM FUNCTIONS ############################
+###############################################################################
 
 ## Apply LM projection functions using each reintrodcution scenario
 ## First, use the deterministic function:
@@ -162,3 +91,36 @@ write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"
 write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"), row.names=F)
 ## MTN projection 1% growth
 write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"), row.names=F)
+
+#####################################################################################
+################ PART 2: Individual Based Model (IBM) (Complex PVA) #################
+#####################################################################################
+
+###############################################################################
+#################### SET THE INITIAL CONDITIONS OF THE IBM ####################
+###############################################################################
+
+## Reintroduction Scenarios for IBM
+ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv"))
+
+## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
+initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=10, weaningAge=4.5)
+nyears <- 50 ## Projection Period
+timeunit <- 1/12 ## timestep
+nruns <- 1000 ## Number of simulations to run
+alpha <- 0.42 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 
+
+###############################################################################
+############################# RUN THE IBM FUNCTION ############################
+###############################################################################
+
+res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
+for(j in 1:length(initalConditions)){
+  for(i in 1:nruns){
+    print(i)
+    abmDataLog <- simTshia(ages0 = initalConditions[[j]][,1], status0 = initalConditions[[j]][,2], time0 = initalConditions[[j]][,3], nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=F)
+    nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
+    res[1:length(nindiv),i] <- nindiv
+  }
+  write.csv(res, file=paste0(workingDir,"pva_IBM_50year/Scenario", j,".csv"), row.names=F)
+}
