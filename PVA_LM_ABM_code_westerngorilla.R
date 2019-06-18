@@ -573,31 +573,31 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Breuer_wlg/"
 ##workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Bronikowski_mtn/"
 
-res <- as.matrix(read.csv(paste0(workingDir_IBM, "noIntro_1F.csv")))
+res <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario1.csv")))
 finalPopSizes <- res[nrow(res),]
 
-res0 <- as.matrix(read.csv(paste0(workingDir_IBM, "noIntro_2F.csv")))
+res0 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario2.csv")))
 finalPopSizes0 <- res0[nrow(res0),]
 
-res1 <- as.matrix(read.csv(paste0(workingDir_IBM, "2Intro_3F.csv")))
+res1 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario3.csv")))
 finalPopSizes1 <- res1[nrow(res1),]
 
-res2 <- as.matrix(read.csv(paste0(workingDir_IBM, "3Intro_4F.csv")))
+res2 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario4.csv")))
 finalPopSizes2 <- res2[nrow(res2),]
 
-res3 <- as.matrix(read.csv(paste0(workingDir_IBM, "4Intro_5F.csv")))
+res3 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario5.csv")))
 finalPopSizes3 <- res3[nrow(res3),]
 
-res4 <- as.matrix(read.csv(paste0(workingDir_IBM, "5Intro_6F.csv")))
+res4 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario6.csv")))
 finalPopSizes4 <- res4[nrow(res4),]
 
-res5 <- as.matrix(read.csv(paste0(workingDir_IBM, "6Intro_7F.csv")))
+res5 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario7.csv")))
 finalPopSizes5 <- res5[nrow(res5),]
 
-res6 <- as.matrix(read.csv(paste0(workingDir_IBM, "7Intro_8F.csv")))
+res6 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario8.csv")))
 finalPopSizes6 <- res6[nrow(res6),]
 
-res7 <- as.matrix(read.csv(paste0(workingDir_IBM, "8Intro_9F.csv")))
+res7 <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario9.csv")))
 finalPopSizes7 <- res7[nrow(res7),]
 
 ## what is probability that simulation results in extinction?
@@ -751,7 +751,7 @@ Nfinal_ibm <- data.frame(scenario = as.factor(LETTERS[1:9]), Nfinal_mean = c(s, 
 
 ##### Plot of final population sizes for WLG
 plot.window(xlim=c(1,9), ylim=c(0,150))
-boxplot(res[nrow(res),], res0[nrow(res0),], res1[nrow(res1),], res2[nrow(res2),], res3[nrow(res3),], res4[nrow(res4),], res5[nrow(res5),], res6[nrow(res6),], res7[nrow(res7),], pch=21, col="coral", bg=coral, ylim=c(0,150), varwidth=FALSE)
+boxplot(res[nrow(res),], res0[nrow(res0),], res1[nrow(res1),], res2[nrow(res2),], res3[nrow(res3),], res4[nrow(res4),], res5[nrow(res5),], res6[nrow(res6),], res7[nrow(res7),], pch=21, col="coral", bg="coral", ylim=c(0,150), varwidth=FALSE)
 lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
 par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
 axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)

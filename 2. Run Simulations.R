@@ -2,11 +2,7 @@
 workingDir <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/"
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
-source("1. Function Definition.R")
-
-#####################################################################################
-##################### PART 1: Leslie Matrix model (Simple PVA) ######################
-#####################################################################################
+source("1. Function Definitions.R")
 
 ## Projections were conducted using 4 possible growth rates: 
 ## A. Mountain gorillas with fertility rates that correspond to 3% growth rate
@@ -15,24 +11,39 @@ source("1. Function Definition.R")
 ## D. Western lowland gorillas with constant fertility rates (due to limited data)
 ## Age of first reproduction = 8 years (for MTN) and 10 years (for WLG)
 
+## Mountain gorilla (MTN) life history parameters taken from Bronikowski et al (2016)
+## Western lowland gorilla (WLG) life history parameters taken from Breuer et al (2010), Breuer (2008) 
+
+####################################################################################
+################# OPTIONAL: CREATE CSV FILES with LESLIE MATRICES ##################
+####################################################################################
+
+dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv"))
+dat$fertilityrate_2percent <- dat[,3]*.786 
+## fertility rates multiplied by factor less than 1 to get eigen values of 1.01 which corresponds to a 1% growth rate
+dat$fertilityrate_1percent <- dat[,3]*.643 
+## fertility rates multiplied by factor less than 1 to get eigen values of 1.02 which corresponds to a 2% growth rate
+
+leslieMatrix(lifetable=dat[,1:3], filename=paste0(workingDir,"LeslieMatrix_MTN_3%.csv"))
+leslieMatrix(lifetable=dat[,c(1:2, 6)], filename=paste0(workingDir,"LeslieMatrix_MTN_2%.csv"))
+leslieMatrix(lifetable=dat[,c(1:2, 7)], filename=paste0(workingDir,"LeslieMatrix_MTN_1%.csv"))
+leslieMatrix(lifetable=dat[,c(1, 4:5)], filename=paste0(workingDir,"LeslieMatrix_WLG.csv"))
+
+#####################################################################################
+##################### PART 1: Leslie Matrix model (Simple PVA) ######################
+#####################################################################################
+
 ###############################################################################
-#################### SET THE INITIAL CONDITIONS OF THE LM #####################
+################# SET THE INITIAL CONDITIONS OF THE LM MODEL ##################
 ###############################################################################
 
-## Reintroduction Scenarios for LM
-ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv"))
-
+ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv")) ## csv file with Reintroduction Scenarios for LM
 nyears <- 50 ## Projection Period
 nruns <- 1000 ## Number of simulations to run
-## Leslie Matrices
-matMTN3 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_3%.csv"))
-matMTN2 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_2%.csv"))
-matMTN1 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_1%.csv"))
-matWLG <- read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))
-mat <- matWLG ## Select the appropriate matrix
+mat <- as.matrix(read.csv(paste0(workingDir, "LeslieMatrix_MTN_3%.csv"))) ## csv file with appropriate Leslie Matrix (needs to be converted to matrix object!)
 
 ###############################################################################
-############################# RUN THE LM FUNCTIONS ############################
+######################### RUN THE LESLIE MATRIX MODELS ########################
 ###############################################################################
 
 ## Apply LM projection functions using each reintrodcution scenario
@@ -41,7 +52,7 @@ projectPop <- for(i in 2:ncol(ReintroScenario)){
   No <- ReintroScenario[,i] ## Get the reintroduction scenario
   N <- pop_projection(tfinal=nyears, LM=mat, No=No) ## Apply pop_projection function to No for this scenario
   scenario <- strsplit(colnames(ReintroScenario)[i], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
-  assign(paste0("N_projected_det", scenario), apply(N,2,sum))  ## Apply the deterministic projection to all scenarios. The assign function takes a variable name as a character string and assigns a value to it. In this case, the values are N at each time step of the projection
+  assign(paste0("N_projected_det", scenario), apply(N,2,sum))  ## The assign function takes a variable name as a character string and assigns a value to it. In this case, the values are N at each time step of the projection
 }
 
 ## Second, use the stochastic function: 
@@ -100,18 +111,23 @@ write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2per
 #################### SET THE INITIAL CONDITIONS OF THE IBM ####################
 ###############################################################################
 
-## Reintroduction Scenarios for IBM
-ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv"))
+ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv")) ## csv file with Reintroduction Scenarios for IBM
+
+## Initial parameters: survivorship, fertility, and weaning age
+datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
+## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
+weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
+adultAge <- 8 ## 10 for WLG, 8 for MTN
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
-initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=10, weaningAge=4.5)
+initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
 nyears <- 50 ## Projection Period
 timeunit <- 1/12 ## timestep
 nruns <- 1000 ## Number of simulations to run
-alpha <- 0.42 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 
+alpha <- 0.99 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 
 
 ###############################################################################
-############################# RUN THE IBM FUNCTION ############################
+################################## RUN THE IBM ################################
 ###############################################################################
 
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)

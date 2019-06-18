@@ -17,15 +17,12 @@ colMTN1 <- "#D58363"
 ## D. Color for WLG 
 colWLG <- "#FF7F50"
 
-plot(rep(1,4), col=c(colMTN3,colMTN2,colMTN1,colWLG), pch=19 ,cex=3)
+##plot(rep(1,4), col=c(colMTN3,colMTN2,colMTN1,colWLG), pch=19 ,cex=3)
 
-matMTN3 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_3%.csv"))
-matMTN2 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_2%.csv"))
-matMTN1 <- read.csv(paste0(workingDir, "LeslieMatrix_MTN_1%.csv"))
-matWLG <- read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))
-
-## Let's plot lambda and extinction probabilities:
-prob_50years_wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
+## Read all csv files:
+dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv")) ## life tables
+## probability of extinctions based on LM projections
+prob_50years_wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv")) 
 prob_50years_mtn_3per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"))
 prob_50years_mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"))
 prob_50years_mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"))
@@ -34,10 +31,30 @@ prob_50years_mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_
 ######## DEMOGRAPHIC PYRAMIDS ##########
 ########################################
 
-## A. Dem Pyramid for MTN with 3%, 2% and 1% growth rate
+## Demographic pyramid for MTN (same for 3%, 2%, and 1%)
+n <- rep(1, nrow(dat))
+n[1] <- 1
+for (i in 2:length(n)){
+  n[i] <- prod(1-dat[1:(i-1),2])
+} ## Make sure sum equals 1 to generate pyramid
+n_mtn <- n/(sum(n))
+## for the cumulative survival curve:
+n_mtnCS <- n/n[1]
+
+## Demographic pyramid for WLG
+n <- rep(1, nrow(dat))
+n[1] <- 1
+for (i in 2:length(n)){
+  n[i] <- prod(1-dat[1:(i-1),4])
+} ## Make sure sum equals 1 to generate pyramid
+n_wlg <- n/(sum(n))
+## for the cumulative survival curve:
+n_wlgCS <- n/n[1]
+
+## Dem Pyramid for MTN with 3%, 2% and 1% growth rate
 barplot(n_mtn, horiz=T, names.arg=paste0(0:(length(n_mtn)-1), "-", 1:length(n_mtn)), las=1, xlab="relative frequency", col=colMTN3, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, xlim=c(0,0.07))
 
-## D. Dem Pyramid for WLG
+## Dem Pyramid for WLG
 barplot(n_wlg, horiz=T, names.arg=paste0(0:(length(n_wlg)-1), "-", 1:length(n_wlg)), las=1, xlab="relative frequency", col=coral, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, add=TRUE)
 
 ########################################
@@ -68,13 +85,13 @@ plot.window(xlim=c(1,9), ylim=c(0,100))
 axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
-title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
-lines(prob_50years_wlg_lm$scenario, prob_50years_wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
-lines(prob_50years_mtn_1per_lm$scenario, prob_50years_mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
-lines(prob_50years_mtn_2per_lm$scenario, prob_50years_mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
-lines(prob_50years_mtn_3per_lm$scenario, prob_50years_mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
-legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
-       pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=2, pch=c(21,22,23,24))
+title(xlab="Reintroduction Scenario", ylab="Chance of Extinction (%)", font.lab=2)
+lines(prob_50years_wlg_lm$scenario, prob_50years_wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21, cex=1)
+lines(prob_50years_mtn_1per_lm$scenario, prob_50years_mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22, cex=1)
+lines(prob_50years_mtn_2per_lm$scenario, prob_50years_mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23, cex=1)
+lines(prob_50years_mtn_3per_lm$scenario, prob_50years_mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24, cex=1)
+legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1% growth", "Mountain Gorillas - 2% growth", "Mountain Gorillas - 3% growth"),
+       pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=1, cex=0.8, pt.cex=1, pch=c(21,22,23,24))
 
 ########################################
 #### LESLIE MATRIX PROJECTION PLOTS ####
@@ -82,17 +99,18 @@ legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain 
 
 simObjects <- c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH", "tempI")
 detObjects <- c("N_projected_detA", "N_projected_detB", "N_projected_detC", "N_projected_detD", "N_projected_detE", "N_projected_detF", "N_projected_detG", "N_projected_detH", "N_projected_detI")
+probExt_lm <- prob_50years_wlg_lm
 
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
 time <- 0:50 ## time interval for the plots
 
 for(j in 1:9){
-  probExt <- prob_50years_wlg_lm[j,6]
-  #probExt <- prob_50years_mtn_lm[,6]##uncomment this line for mountain gorilla demographic parameter simulations
+  ##probExt <- prob_50years_wlg_lm[j,6] ##uncomment this line for western gorilla demographic parameter simulations
+  probExt <- prob_50years_mtn_lm[,6] ##uncomment this line for mountain gorilla demographic parameter simulations
   tempX <- get(simObjects[j])
   N_projected_detX <- get(detObjects[j])
-  plot(N_projected_det~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
+  plot(N_projected_detX~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
   for(i in 1:ncol(tempX)){
     lines(time, tempX[,i], col=grey(.8, alpha=.05), lwd=3)
   } ## plots projections from stochastic LM simulations
