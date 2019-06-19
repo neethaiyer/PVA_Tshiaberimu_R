@@ -259,10 +259,10 @@ write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2per
 ## png(file_path, width=4, height=4, units='in', res=100)
 
 ## Let's plot lambda and extinction probabilities. Use the correct dataframe for either WLG or MTN:
-prob_50years_wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
-prob_50years_mtn_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"))
-prob_50years_mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"))
-prob_50years_mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"))
+wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
+mtn_3per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_3%.csv"))
+mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2%.csv"))
+mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1%.csv"))
 
 ################################################################################################
 ################################ Plots of extinction probability  ##############################
@@ -275,10 +275,10 @@ axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
 title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
-lines(prob_50years_wlg_lm$scenario, prob_50years_wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
-lines(prob_50years_mtn_1per_lm$scenario, prob_50years_mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
-lines(prob_50years_mtn_2per_lm$scenario, prob_50years_mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
-lines(prob_50years_mtn_lm$scenario, prob_50years_mtn_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
+lines(wlg_lm$scenario, wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
+lines(mtn_1per_lm$scenario, mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
+lines(mtn_2per_lm$scenario, mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
+lines(mtn_3per_lm$scenario, mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
 legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
        pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=2, pch=c(21,22,23,24))
 
@@ -571,7 +571,8 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 
 ## Select the correct folder for either WLG or MTN data
 workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Breuer_wlg/"
-##workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Bronikowski_mtn/"
+workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Bronikowski_mtn/"
+workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_mtn_0.85/"
 
 res <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario1.csv")))
 finalPopSizes <- res[nrow(res),]
@@ -695,7 +696,7 @@ lambda_extn_ibm <- data.frame(scenario = as.factor(LETTERS[1:9]), lambda_50years
 ## WLG values
 write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG.csv", row.names=F)
 ## MTN values
-write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN.csv", row.names=F)
+write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.85.csv", row.names=F)
 
 ################################################################################################
 ###################################### PLOTS for IBM ###########################################
@@ -759,8 +760,8 @@ axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 
 ##### Plot of final population sizes for MTN
-plot.window(xlim=c(1,9), ylim=c(0,150))
-boxplot(res[nrow(res),], res0[nrow(res0),], res1[nrow(res1),], res2[nrow(res2),], res3[nrow(res3),], res4[nrow(res4),], res5[nrow(res5),], res6[nrow(res6),], res7[nrow(res7),], pch=24, col="azure4", bg=azure4, ylim=c(0,150), varwidth=FALSE)
+plot.window(xlim=c(1,9), ylim=c(0,300))
+boxplot(res[nrow(res),], res0[nrow(res0),], res1[nrow(res1),], res2[nrow(res2),], res3[nrow(res3),], res4[nrow(res4),], res5[nrow(res5),], res6[nrow(res6),], res7[nrow(res7),], pch=24, col="azure4", bg="azure4", ylim=c(0,300), varwidth=FALSE)
 lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
 par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
 axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
@@ -768,26 +769,31 @@ axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 
 ## Let's plot lambda and extinction probabilities
-parameters_wlg_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG.csv"))
-parameters_mtn_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN.csv"))
+wlg_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG.csv"))
+mtn_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN.csv"))
+mtn_ibm_0.85 <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.85.csv"))
 
 ################################################################################################
 ################################ Plots of extinction probability  ##############################
 ################################# For WLG, MTN using LM and IBM  ###############################
 ################################################################################################
+
 plot.new()
-par(mar=c(5.1,4.1,4.1,5.1))
+par(mfrow=c(1,1), mar=c(5.1,4.1,4.1,5.1))
 plot.window(xlim=c(1,9), ylim=c(0,100))
 axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
 title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
-lines(parameters_wlg_ibm$scenario, parameters_wlg_ibm$prob_Extn, bg="coral", type="b", pch=21)
-lines(parameters_mtn_ibm$scenario, parameters_mtn_ibm$prob_Extn, bg="azure4", type="b", pch=24)
-lines(parameters_wlg_lm$scenario, parameters_wlg_lm$prob_Extn, bg=coral, type="b", pch=21, lty=2)
-lines(parameters_mtn_lm$scenario, parameters_mtn_lm$prob_Extn, bg=azure4, type="b", pch=24, lty=2)
-legend(1, 100, legend=c("Western Gorillas - IBM", "Western Gorillas - LM", "Mountain Gorillas - IBM", "Mountain Gorillas - LM"),
-       pt.bg=c("coral", coral, "azure4", azure4), pch=c(21,21,24,24), lty=c(1,2,1,2), cex=0.8, text.font=2)
+lines(wlg_lm$scenario, wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
+lines(wlg_ibm$scenario, wlg_ibm$prob_Extn, bg="#FF7F50", type="b", pch=21, lty=2)
+lines(mtn_3per_lm$scenario, mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
+lines(mtn_ibm$scenario, mtn_ibm$prob_Extn, bg="#838B8B", type="b", pch=24, lty=2)
+lines(mtn_1per_lm$scenario, mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
+lines(mtn_2per_lm$scenario, mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
+lines(mtn_ibm_0.85$scenario, mtn_ibm_0.85$prob_Extn, bg="#AC8777", type="b", pch=23)
+legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
+       pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=2, pch=c(21,22,23,24))
 
 ################################################################################################
 #################################### Plots of lambda values  ###################################

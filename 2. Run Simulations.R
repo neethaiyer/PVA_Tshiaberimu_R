@@ -40,7 +40,7 @@ leslieMatrix(lifetable=dat[,c(1, 4:5)], filename=paste0(workingDir,"LeslieMatrix
 ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv")) ## csv file with Reintroduction Scenarios for LM
 nyears <- 50 ## Projection Period
 nruns <- 1000 ## Number of simulations to run
-mat <- as.matrix(read.csv(paste0(workingDir, "LeslieMatrix_MTN_3%.csv"))) ## csv file with appropriate Leslie Matrix (needs to be converted to matrix object!)
+mat <- as.matrix(read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))) ## csv file with appropriate Leslie Matrix (needs to be converted to matrix object!)
 
 ###############################################################################
 ######################### RUN THE LESLIE MATRIX MODELS ########################
@@ -97,11 +97,11 @@ for(i in c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH
 #dir.create(paste0(workingDir,"pva_lambda_extn"))##run this line if pva_lambda_extn does not exist and needs to be created
 write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"), row.names=F)
 ## MTN projection 3% growth
-write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"), row.names=F)
+write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_3%.csv"), row.names=F)
 ## MTN projection 2% growth
-write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"), row.names=F)
+write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2%.csv"), row.names=F)
 ## MTN projection 1% growth
-write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"), row.names=F)
+write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1%.csv"), row.names=F)
 
 #####################################################################################
 ################ PART 2: Individual Based Model (IBM) (Complex PVA) #################
@@ -124,7 +124,7 @@ initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adult
 nyears <- 50 ## Projection Period
 timeunit <- 1/12 ## timestep
 nruns <- 1000 ## Number of simulations to run
-alpha <- 0.99 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 
+alpha <- 0.85 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 
 
 ###############################################################################
 ################################## RUN THE IBM ################################

@@ -22,10 +22,10 @@ colWLG <- "#FF7F50"
 ## Read all csv files:
 dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv")) ## life tables
 ## probability of extinctions based on LM projections
-prob_50years_wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv")) 
-prob_50years_mtn_3per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN.csv"))
-prob_50years_mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2percent.csv"))
-prob_50years_mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1percent.csv"))
+wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
+mtn_3per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_3%.csv"))
+mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2%.csv"))
+mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1%.csv"))
 
 ########################################
 ######## DEMOGRAPHIC PYRAMIDS ##########
@@ -85,13 +85,13 @@ plot.window(xlim=c(1,9), ylim=c(0,100))
 axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
-title(xlab="Reintroduction Scenario", ylab="Chance of Extinction (%)", font.lab=2)
-lines(prob_50years_wlg_lm$scenario, prob_50years_wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21, cex=1)
-lines(prob_50years_mtn_1per_lm$scenario, prob_50years_mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22, cex=1)
-lines(prob_50years_mtn_2per_lm$scenario, prob_50years_mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23, cex=1)
-lines(prob_50years_mtn_3per_lm$scenario, prob_50years_mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24, cex=1)
-legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1% growth", "Mountain Gorillas - 2% growth", "Mountain Gorillas - 3% growth"),
-       pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=1, cex=0.8, pt.cex=1, pch=c(21,22,23,24))
+title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
+lines(wlg_lm$scenario, wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
+lines(mtn_1per_lm$scenario, mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
+lines(mtn_2per_lm$scenario, mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
+lines(mtn_3per_lm$scenario, mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
+legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
+       pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=2, pch=c(21,22,23,24))
 
 ########################################
 #### LESLIE MATRIX PROJECTION PLOTS ####
