@@ -310,7 +310,7 @@ for(i in 1:ncol(tempX)){
 } ## plots projections from stochastic LM simulations
 lines(apply(tempX, 1, mean)~time, type="l", col=2, lwd=4) ## plot mean projection from stochastic LM simulations
 lines(N_projected_detX~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-title(main="A: No introduction, male juvenile", sub=paste0("Probability of extinction = ",probExt, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
+title(main="A: No introduction, male juvenile", sub=paste0("Extinction Risk = ",probExt, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
 qtiles <- apply(tempX, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
 lines((0:(nrow(tempX)-1)), qtiles[1,], col=1, lty=2)
 lines((0:(nrow(tempX)-1)), qtiles[2,], col=1, lty=2)
@@ -547,12 +547,12 @@ for(j in 1:length(initalConditions)){
 nyears <- 20
 timeunit <- 1/12
 nruns <-1
-alpha <- 0.85 ## alpha = 0.42 for WLG
+alpha <- 0.99 ## alpha = 0.42 for WLG
 res <- data.frame(Year=numeric(0), nyears=numeric(0), nInf = numeric(0))
 
 for(i in 1:nruns){
   abmDataLog <- simTshia(ages0 = rep(10, 100), status0 =rep(c("C", "L"), c(20, 80)) , time0 = 0, nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=T)
-  abmDataLog2 <- abmDataLog[abmDataLog$ages>=10,]
+  abmDataLog2 <- abmDataLog[abmDataLog$ages>=8,]
   for (j in unique(abmDataLog2$indiv)){
     temp <- abmDataLog2[abmDataLog2$indiv==j & abmDataLog2$timestep>(10/timeunit),"status"]
     nInf <- sum(((temp=="L")[-1]-(temp=="L")[-length(temp)])==1)
@@ -696,7 +696,7 @@ lambda_extn_ibm <- data.frame(scenario = as.factor(LETTERS[1:9]), lambda_50years
 ## WLG values
 write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG.csv", row.names=F)
 ## MTN values
-write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.85.csv", row.names=F)
+##write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.85.csv", row.names=F)
 
 ################################################################################################
 ###################################### PLOTS for IBM ###########################################
@@ -837,7 +837,7 @@ lines((0:(nrow(res)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="A: No introduction, male juvenile", sub=paste0("Probability of extinction = ", round(probExtA, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="A: No introduction, male juvenile", sub=paste0("Extinction Risk = ", round(probExtA, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -859,7 +859,7 @@ lines((0:(nrow(res0)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res0)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="B: No introduction, female juvenile", sub=paste0("Probability of extinction = ", round(probExtB, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="B: No introduction, female juvenile", sub=paste0("Extinction Risk = ", round(probExtB, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -881,7 +881,7 @@ lines((0:(nrow(res1)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res1)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="C: 2 females introduced", sub=paste0("Probability of extinction = ", round(probExtC, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="C: 2 females introduced", sub=paste0("Extinction Risk = ", round(probExtC, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -903,7 +903,7 @@ lines((0:(nrow(res2)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res2)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="D: 3 females introduced", sub=paste0("Probability of extinction = ", round(probExtD, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="D: 3 females introduced", sub=paste0("Extinction Risk = ", round(probExtD, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -925,7 +925,7 @@ lines((0:(nrow(res3)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res3)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="E: 4 females introduced", sub=paste0("Probability of extinction = ", round(probExtE, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="E: 4 females introduced", sub=paste0("Extinction Risk = ", round(probExtE, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -947,7 +947,7 @@ lines((0:(nrow(res4)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res4)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="F: 5 females introduced", sub=paste0("Probability of extinction = ", round(probExtF, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="F: 5 females introduced", sub=paste0("Extinction Risk = ", round(probExtF, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -969,7 +969,7 @@ lines((0:(nrow(res5)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res5)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="G: 6 females introduced", sub=paste0("Probability of extinction = ", round(probExtG, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="G: 6 females introduced", sub=paste0("Extinction Risk = ", round(probExtG, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -991,7 +991,7 @@ lines((0:(nrow(res6)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res6)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="H: 7 females introduced", sub=paste0("Probability of extinction = ", round(probExtH, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="H: 7 females introduced", sub=paste0("Extinction Risk = ", round(probExtH, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
@@ -1013,7 +1013,7 @@ lines((0:(nrow(res7)-1))*timeunit, qtiles[1,], lty=2)
 lines((0:(nrow(res7)-1))*timeunit, qtiles[2,], lty=2)
 
 ## add some graph fluff
-title(main="I: 8 females introduced", sub=paste0("Probability of extinction = ", round(probExtI, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+title(main="I: 8 females introduced", sub=paste0("Extinction Risk = ", round(probExtI, 3)*100, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
 
 ## add a line for the 50 individual mark
 lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
