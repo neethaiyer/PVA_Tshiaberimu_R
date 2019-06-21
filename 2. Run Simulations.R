@@ -124,7 +124,7 @@ initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adult
 nyears <- 50 ## Projection Period
 timeunit <- 1/12 ## timestep
 nruns <- 1000 ## Number of simulations to run
-alpha <- 0.85 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 
+alpha <- 0.65 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 
 
 ###############################################################################
 ################################## RUN THE IBM ################################

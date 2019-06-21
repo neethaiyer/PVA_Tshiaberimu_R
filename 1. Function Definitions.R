@@ -101,6 +101,8 @@ CP <- function(t, alpha) 1-exp(log(1-alpha)/(1/timeunit)) ## Probability for a c
 ## (1-p)^(1/timeunit)=1-alpha
 ## log(1-p)=log(1-alpha)/(1/timeunit)
 ## p=1-exp(log(1-alpha)/(1/timeunit))
+## alpha is probability to be pregnant after 1 year of cycling. alpha tunes the interbirth interval. 
+## p is the alpha per month (probability to get pregnant per month)
 
 ############################################################################
 #################### FUNCTION 7: Transition from P to L ####################

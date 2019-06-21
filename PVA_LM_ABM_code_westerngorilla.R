@@ -547,7 +547,7 @@ for(j in 1:length(initalConditions)){
 nyears <- 20
 timeunit <- 1/12
 nruns <-1
-alpha <- 0.99 ## alpha = 0.42 for WLG
+alpha <- 0.99 ## alpha = 0.42 for WLG, lower alpha values are due to longer interbirth intervals
 res <- data.frame(Year=numeric(0), nyears=numeric(0), nInf = numeric(0))
 
 for(i in 1:nruns){
