@@ -572,7 +572,7 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 ## Select the correct folder for either WLG or MTN data
 workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Breuer_wlg/"
 workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Bronikowski_mtn/"
-workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_mtn_0.85/"
+workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_mtn_0.65/"
 
 res <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario1.csv")))
 finalPopSizes <- res[nrow(res),]
@@ -694,9 +694,9 @@ lambda_extn_ibm <- data.frame(scenario = as.factor(LETTERS[1:9]), lambda_50years
 
 ## Make sure you use the correct LM for WLG or MTN when you run the code
 ## WLG values
-write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG.csv", row.names=F)
+##write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG.csv", row.names=F)
 ## MTN values
-##write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.85.csv", row.names=F)
+write.csv(lambda_extn_ibm, file="/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.65.csv", row.names=F)
 
 ################################################################################################
 ###################################### PLOTS for IBM ###########################################
@@ -769,9 +769,10 @@ axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 
 ## Let's plot lambda and extinction probabilities
-wlg_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG.csv"))
-mtn_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN.csv"))
+wlg_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_WLG_0.42.csv"))
+mtn_ibm <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.99.csv"))
 mtn_ibm_0.85 <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.85.csv"))
+mtn_ibm_0.65 <- as.data.frame(read.csv("/Users/neethaiyer/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_lambda_extn/lambda_extn_ibm_MTN_0.65.csv"))
 
 ################################################################################################
 ################################ Plots of extinction probability  ##############################
@@ -784,15 +785,16 @@ plot.window(xlim=c(1,9), ylim=c(0,100))
 axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
-title(xlab="Reintroduction Scenario", ylab="Probability of Extinction", font.lab=2)
+title(xlab="Reintroduction Scenario", ylab="Chance of Extinction (%)", font.lab=2)
 lines(wlg_lm$scenario, wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
 lines(wlg_ibm$scenario, wlg_ibm$prob_Extn, bg="#FF7F50", type="b", pch=21, lty=2)
 lines(mtn_3per_lm$scenario, mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
 lines(mtn_ibm$scenario, mtn_ibm$prob_Extn, bg="#838B8B", type="b", pch=24, lty=2)
 lines(mtn_1per_lm$scenario, mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
+lines(mtn_ibm_0.65$scenario, mtn_ibm_0.65$prob_Extn, bg="#D58363", type="b", pch=22, lty=2)
 lines(mtn_2per_lm$scenario, mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
-lines(mtn_ibm_0.85$scenario, mtn_ibm_0.85$prob_Extn, bg="#AC8777", type="b", pch=23)
-legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
+lines(mtn_ibm_0.85$scenario, mtn_ibm_0.85$prob_Extn, bg="#AC8777", type="b", pch=23, lty=2)
+legend(1, 100, legend=c("Western Gorillas", "Mountain Gorillas - 1% growth", "Mountain Gorillas - 2% growth", "Mountain Gorillas - 3% growth"),
        pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=2, pch=c(21,22,23,24))
 
 ################################################################################################

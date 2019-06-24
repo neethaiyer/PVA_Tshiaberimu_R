@@ -2,9 +2,9 @@
 workingDir <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/"
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
-source("1. Function Definitions.R")
+source("1. Function Definitions.R") ## this will source the functions used in the simulations below
 
-## Projections were conducted using 4 possible growth rates: 
+## Projections were conducted using 4 possible growth rates. Make sure the right csv file is selected for each simulation. 
 ## A. Mountain gorillas with fertility rates that correspond to 3% growth rate
 ## B. Mountain gorillas with fertility rates that correspond to 2% growth rate
 ## C. Mountain gorillas with fertility rates that correspond to 1% growth rate
@@ -61,15 +61,15 @@ tempA <- tempB <- tempC <- tempD <- tempE <- tempF <- tempG <- tempH <- tempI <-
 
 ## Run each scenario 1000 times using the stochastic projection
 for(i in 1:nruns) {
-  tempA[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_A),2,sum)
-  tempB[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_B),2,sum)
-  tempC[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_C),2,sum)
-  tempD[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_D),2,sum)
-  tempE[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_E),2,sum)
-  tempF[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_F),2,sum)
-  tempG[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_G),2,sum)
-  tempH[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_H),2,sum)
-  tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$No_I),2,sum)
+  tempA[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_A),2,sum)
+  tempB[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_B),2,sum)
+  tempC[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_C),2,sum)
+  tempD[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_D),2,sum)
+  tempE[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_E),2,sum)
+  tempF[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_F),2,sum)
+  tempG[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_G),2,sum)
+  tempH[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_H),2,sum)
+  tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_I),2,sum)
 }
 
 ## Calculate the probability that a simulation results in extinction at the end of 50 years. 
