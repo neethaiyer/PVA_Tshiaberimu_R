@@ -547,21 +547,21 @@ for(j in 1:length(initalConditions)){
 nyears <- 20
 timeunit <- 1/12
 nruns <-1
-alpha <- 0.99 ## alpha = 0.42 for WLG, 0.65, 0.85, and 0.99 for MTN (1%, 2%, 3%) lower alpha values are due to longer interbirth intervals
+alpha <- 0.6 ## alpha = 0.42 for WLG, 0.65, 0.85, and 0.99 for MTN (1%, 2%, 3%) lower alpha values are due to longer interbirth intervals
 res <- data.frame(Year=numeric(0), nyears=numeric(0), nInf = numeric(0))
 
 for(i in 1:nruns){
   abmDataLog <- simTshia(ages0 = rep(10, 100), status0 =rep(c("C", "L"), c(20, 80)) , time0 = 0, nyears=nyears, alpha=alpha, timeunit=timeunit, verbose=T)
   abmDataLog2 <- abmDataLog[abmDataLog$ages>=8,]
   for (j in unique(abmDataLog2$indiv)){
-    temp <- abmDataLog2[abmDataLog2$indiv==j & abmDataLog2$timestep>(10/timeunit),"status"]
-    nInf <- sum(((temp=="L")[-1]-(temp=="L")[-length(temp)])==1)
+    temp <- abmDataLog2[abmDataLog2$indiv==j & abmDataLog2$timestep>(10/timeunit),"status"]##remove data from 10-year burn-in period
+    nInf <- sum(((temp=="L")[-1]-(temp=="L")[-length(temp)])==1)## number of transitions between P to L results in number of births
     nYearObs <- length(temp)*timeunit
     res <- rbind(res, data.frame(nyears= nYearObs, nInf = nInf))
   } 
 }
 
-apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
+sum(res$nInf)/sum(res$nyears) ## fertility rate
 
 ########################################################################################
 ################# STEP 7: EXAMINE DATA FROM REINTRODUCTION SCENARIOS ###################
@@ -573,6 +573,7 @@ apply(res, 2, sum)[2]/apply(res, 2, sum)[1]
 workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Breuer_wlg/"
 workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_Bronikowski_mtn/"
 workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_mtn_0.65/"
+workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_ABM_50year_mtn_0.85/"
 
 res <- as.matrix(read.csv(paste0(workingDir_IBM, "Scenario1.csv")))
 finalPopSizes <- res[nrow(res),]
