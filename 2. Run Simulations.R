@@ -1,8 +1,10 @@
 ## Set the working directory:
 workingDir <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/"
+setwd(workingDir)
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
-source("1. Function Definitions.R") ## this will source the functions used in the simulations below
+## Source the functions used in simulations below:
+source("1. Function Definitions.R") 
 
 ## Projections were conducted using 4 possible growth rates. Make sure the right csv file is selected for each simulation. 
 ## A. Mountain gorillas with fertility rates that correspond to 3% growth rate
@@ -15,7 +17,7 @@ source("1. Function Definitions.R") ## this will source the functions used in th
 ## Western lowland gorilla (WLG) life history parameters taken from Breuer et al (2010), Breuer (2008) 
 
 ####################################################################################
-################# OPTIONAL: CREATE CSV FILES with LESLIE MATRICES ##################
+############################ READ LIFE HISTORY TABLE ###############################
 ####################################################################################
 
 dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv"))
@@ -24,23 +26,42 @@ dat$fertilityrate_2percent <- dat[,3]*.786
 dat$fertilityrate_1percent <- dat[,3]*.643 
 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.02 which corresponds to a 2% growth rate
 
+####################################################################################
+################# OPTIONAL: CREATE CSV FILES with LESLIE MATRICES ##################
+####################################################################################
+
 leslieMatrix(lifetable=dat[,1:3], filename=paste0(workingDir,"LeslieMatrix_MTN_3%.csv"))
 leslieMatrix(lifetable=dat[,c(1:2, 6)], filename=paste0(workingDir,"LeslieMatrix_MTN_2%.csv"))
 leslieMatrix(lifetable=dat[,c(1:2, 7)], filename=paste0(workingDir,"LeslieMatrix_MTN_1%.csv"))
 leslieMatrix(lifetable=dat[,c(1, 4:5)], filename=paste0(workingDir,"LeslieMatrix_WLG.csv"))
 
+###############################################################################
+############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
+###############################################################################
+
+## Reintroduction Scenarios:
+ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv")) ## csv file with Reintroduction Scenarios for LM
+ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv")) ## csv file with Reintroduction Scenarios for IBM
+
+## Time parameters:
+mat <- as.matrix(read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))) ## csv file with appropriate Leslie Matrix (needs to be converted to matrix object!)
+nyears <- 50 ## Projection Period
+nruns <- 1000 ## Number of simulations to run
+timeunit <- 1/12 ## timestep for IBM
+
+## Initial demographic parameters: survivorship, fertility, and weaning age
+datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
+## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
+weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
+adultAge <- 8 ## 10 for WLG, 8 for MTN
+alpha <- 0.99 ## function of the fertility rate, 0.99, 0.85 and 0.65 for MTN gorillas with 3%, 2%, and 1% growth rates and 0.42 for WLG growth rates. 
+
+## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
+initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
+
 #####################################################################################
 ##################### PART 1: Leslie Matrix model (Simple PVA) ######################
 #####################################################################################
-
-###############################################################################
-################# SET THE INITIAL CONDITIONS OF THE LM MODEL ##################
-###############################################################################
-
-ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv")) ## csv file with Reintroduction Scenarios for LM
-nyears <- 50 ## Projection Period
-nruns <- 1000 ## Number of simulations to run
-mat <- as.matrix(read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))) ## csv file with appropriate Leslie Matrix (needs to be converted to matrix object!)
 
 ###############################################################################
 ######################### RUN THE LESLIE MATRIX MODELS ########################
@@ -72,13 +93,15 @@ for(i in 1:nruns) {
   tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_I),2,sum)
 }
 
+###############################################################################
+############ CALCULATE LIKELIHOOD OF EXTINCTION, LAMBDA, & Ne = 50 ############
+###############################################################################
+
 ## Calculate the probability that a simulation results in extinction at the end of 50 years. 
-## Calculate the probability that the population reaches at least 50 (or 40, 100, 150) individuals within 50 years?
+## Calculate the probability that the population reaches at least 50 individuals within 50 years.
+
 prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]), 
-                           prob_150 =  NA, 
-                           prob_100 = NA, 
                            prob_50 = NA, 
-                           prob_40 = NA, 
                            prob_Extn = NA)
 index <- 0
 for(i in c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH", "tempI")){
@@ -86,45 +109,24 @@ for(i in c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH
   tempx <- get(i)
   ext <- tempx[nrow(tempx),]==0
   probExt <- mean(ext)
-  probNe_150 <- mean(tempx[nrow(tempx),]>=150)
-  probNe_100 <- mean(tempx[nrow(tempx),]>=100)
   probNe_50 <- mean(tempx[nrow(tempx),]>=50)
-  probNe_40 <- mean(tempx[nrow(tempx),]>=40)
-  prob_50years[index,2:6] <- c(probNe_150, probNe_100, probNe_50, probNe_40, probExt)*100	
+  prob_50years[index,2:3] <- c(probNe_50, probExt)*100	
 }
 
 ## Make sure you use the correct LM for WLG or MTN when you run the code
-#dir.create(paste0(workingDir,"pva_lambda_extn"))##run this line if pva_lambda_extn does not exist and needs to be created
-write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"), row.names=F)
+##dir.create(paste0(workingDir,"pva_extn_results"))##run this line if pva_extn_results does not exist and needs to be created
 ## MTN projection 3% growth
-write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_3%.csv"), row.names=F)
+write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_lm_MTN_3%.csv"), row.names=F)
 ## MTN projection 2% growth
-write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2%.csv"), row.names=F)
+##write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_lm_MTN_2%.csv"), row.names=F)
 ## MTN projection 1% growth
-write.csv(prob_50years, file=paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1%.csv"), row.names=F)
+##write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_lm_MTN_1%.csv"), row.names=F)
+## WLG projection
+##write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_lm_WLG.csv"), row.names=F)
 
 #####################################################################################
 ################ PART 2: Individual Based Model (IBM) (Complex PVA) #################
 #####################################################################################
-
-###############################################################################
-#################### SET THE INITIAL CONDITIONS OF THE IBM ####################
-###############################################################################
-
-ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv")) ## csv file with Reintroduction Scenarios for IBM
-
-## Initial parameters: survivorship, fertility, and weaning age
-datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
-## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
-weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
-adultAge <- 8 ## 10 for WLG, 8 for MTN
-
-## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
-initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
-nyears <- 50 ## Projection Period
-timeunit <- 1/12 ## timestep
-nruns <- 1000 ## Number of simulations to run
-alpha <- 0.75 ## function of the fertility rate, 0.99 for MTN 3% growth rate, 0.42 for WLG, 0.85 and 0.65 for 2% and 1% growth rate
 
 ###############################################################################
 ################################## RUN THE IBM ################################
@@ -140,3 +142,43 @@ for(j in 1:length(initalConditions)){
   }
   write.csv(res, file=paste0(workingDir,"pva_IBM_50year/Scenario", j,".csv"), row.names=F)
 }
+
+###############################################################################
+############ CALCULATE LIKELIHOOD OF EXTINCTION, LAMBDA, & Ne = 50 ############
+###############################################################################
+
+### Now that the csv files have been written, we may not want to re-run the code for as long in the future, so we can just read the generated files and plot the data directly. Make sure you're reading the csv files from the correct folder. 
+
+## Select the correct folder for either WLG or MTN data
+workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/"
+##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
+##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
+##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
+
+setwd(workingDir_IBM)
+allScenarioFiles <- list.files(pattern="*.csv")
+
+## what is probability that simulation results in extinction?
+## see how many times final population is less than 0 (in last row of temp matrix or in all years of the projection?)
+
+prob_50years <- data.frame(scenario = as.factor(LETTERS[1:length(allScenarioFiles)]), 
+                           probNe_50 = NA, 
+                           prob_Extn = NA)
+
+index <- 0
+for(i in 1:length(allScenarioFiles)){
+  index <- index+1
+  resx <- as.matrix(read.csv(paste0(workingDir_IBM, allScenarioFiles[[i]])))
+  probNe_50 <- mean(resx[nrow(resx),]>=50)
+  prob_Extn <- mean(resx[nrow(resx),]==0)
+  prob_50years[index,2:3] <- c(probNe_50, prob_Extn)*100
+}
+
+## Make sure you use the correct LM for WLG or MTN when you run the code
+#dir.create(paste0(workingDir,"pva_extn_results"))##run this line if pva_extn_results does not exist and needs to be created
+## MTN projection 3% growth
+write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_MTN_3%.csv"), row.names=F)
+#write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_MTN_2%.csv"), row.names=F)
+#write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_MTN_1%.csv"), row.names=F)
+#write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_WLG.csv"), row.names=F)
+

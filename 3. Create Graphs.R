@@ -1,5 +1,6 @@
 ## Set the working directory:
 workingDir <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/"
+workingDir_Results <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results"
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
 ## Let's pick our colors for MTN and WLG and include a transparency factor; note that these are only used for the bargraph below:
@@ -22,10 +23,10 @@ colWLG <- "#FF7F50"
 ## Read all csv files:
 dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv")) ## life tables
 ## probability of extinctions based on LM projections
-wlg_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_WLG.csv"))
-mtn_3per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_3%.csv"))
-mtn_2per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_2%.csv"))
-mtn_1per_lm <- read.csv(paste0(workingDir,"pva_lambda_extn/extn_lm_MTN_1%.csv"))
+wlg_lm <- read.csv(paste0(workingDir_Results,"pva_lambda_extn/extn_lm_WLG.csv"))
+mtn_3per_lm <- read.csv(paste0(workingDir_Results,"pva_lambda_extn/extn_lm_MTN_3%.csv"))
+mtn_2per_lm <- read.csv(paste0(workingDir_Results,"pva_lambda_extn/extn_lm_MTN_2%.csv"))
+mtn_1per_lm <- read.csv(paste0(workingDir_Results,"pva_lambda_extn/extn_lm_MTN_1%.csv"))
 
 ########################################
 ######## DEMOGRAPHIC PYRAMIDS ##########
