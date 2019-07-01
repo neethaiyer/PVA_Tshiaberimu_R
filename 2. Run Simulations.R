@@ -50,7 +50,7 @@ nruns <- 1000 ## Number of simulations to run
 timeunit <- 1/12 ## timestep for IBM
 
 ## Initial demographic parameters: survivorship, fertility, and weaning age
-datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
+datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
 weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
 adultAge <- 8 ## 10 for WLG, 8 for MTN
@@ -69,33 +69,38 @@ initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adult
 
 ## Apply LM projection functions using each reintrodcution scenario
 ## First, use the deterministic function:
-projectPop <- for(i in 2:ncol(ReintroScenario)){
-  No <- ReintroScenario[,i] ## Get the reintroduction scenario
-  N <- pop_projection(tfinal=nyears, LM=mat, No=No) ## Apply pop_projection function to No for this scenario
-  scenario <- strsplit(colnames(ReintroScenario)[i], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
-  assign(paste0("N_projected_det", scenario), apply(N,2,sum))  ## The assign function takes a variable name as a character string and assigns a value to it. In this case, the values are N at each time step of the projection
-}
+  projectPop <- for(i in 2:ncol(ReintroScenario)){
+    No <- ReintroScenario[,i] ## Get the reintroduction scenario
+    N <- pop_projection(tfinal=nyears, LM=mat, No=No) ## Apply pop_projection function to No for this scenario
+    scenario <- strsplit(colnames(ReintroScenario)[i], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
+    det <- assign(paste0("N_projected_det", scenario), apply(N,2,sum))  ## The assign function takes a variable name as a character string and assigns a value to it. In this case, the values are N at each time step of the projection
+    write.csv(det, file=paste0(workingDir, "pva_projection_LM/LM_Det_Scenario", i-1, ".csv"), row.names=F)
+  }
 
-## Second, use the stochastic function: 
-tempA <- tempB <- tempC <- tempD <- tempE <- tempF <- tempG <- tempH <- tempI <- matrix(0, nrow=nyears+1, ncol=nruns)
-## create empty matrices that will save the number of individuals for each year of the projection for each run of the LM projection 
+## Second, use the stochastic function:
+temp <- matrix(0, nrow=nyears+1, ncol=nruns)
+## create an empty matrix that will save the number of individuals for each year of the projection for each run of the LM projection 
 
-## Run each scenario 1000 times using the stochastic projection
-for(i in 1:nruns) {
-  tempA[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_A),2,sum)
-  tempB[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_B),2,sum)
-  tempC[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_C),2,sum)
-  tempD[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_D),2,sum)
-  tempE[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_E),2,sum)
-  tempF[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_F),2,sum)
-  tempG[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_G),2,sum)
-  tempH[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_H),2,sum)
-  tempI[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario$Re_I),2,sum)
+for(j in 1:length(ReintroScenario)){
+  for(i in 1:nruns) {
+    temp[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario[,j+1]),2,sum)
+  }
+  write.csv(temp, file=paste0(workingDir,"pva_projection_LM/LM_Scenario", j,".csv"), row.names=F)
 }
 
 ###############################################################################
-############ CALCULATE LIKELIHOOD OF EXTINCTION, LAMBDA, & Ne = 50 ############
+################ CALCULATE LIKELIHOOD OF EXTINCTION & Pop = 50 ################
 ###############################################################################
+### Now that the csv files have been written, we may not want to re-run the code for as long in the future, so we can just read the generated files and plot the data directly. Make sure you're reading the csv files from the correct folder. 
+
+## Select the correct folder for either WLG or MTN data
+workingDir_LM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/"
+##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
+##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
+##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
+
+setwd(workingDir_LM)
+allScenarioFiles <- list.files(pattern="*.csv")
 
 ## Calculate the probability that a simulation results in extinction at the end of 50 years. 
 ## Calculate the probability that the population reaches at least 50 individuals within 50 years.
@@ -104,9 +109,9 @@ prob_50years <- data.frame(scenario = as.factor(LETTERS[1:9]),
                            prob_50 = NA, 
                            prob_Extn = NA)
 index <- 0
-for(i in c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH", "tempI")){
+for(i in 1:length(allScenarioFiles)){
   index <- index+1
-  tempx <- get(i)
+  tempx <- as.matrix(read.csv(paste0(workingDir_LM, allScenarioFiles[[i]])))
   ext <- tempx[nrow(tempx),]==0
   probExt <- mean(ext)
   probNe_50 <- mean(tempx[nrow(tempx),]>=50)
@@ -140,11 +145,11 @@ for(j in 1:length(initalConditions)){
     nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
     res[1:length(nindiv),i] <- nindiv
   }
-  write.csv(res, file=paste0(workingDir,"pva_IBM_50year/Scenario", j,".csv"), row.names=F)
+  write.csv(res, file=paste0(workingDir,"pva_projection_IBM/IBM_Scenario", j,".csv"), row.names=F)
 }
 
 ###############################################################################
-############ CALCULATE LIKELIHOOD OF EXTINCTION, LAMBDA, & Ne = 50 ############
+################ CALCULATE LIKELIHOOD OF EXTINCTION & Pop = 50 ################
 ###############################################################################
 
 ### Now that the csv files have been written, we may not want to re-run the code for as long in the future, so we can just read the generated files and plot the data directly. Make sure you're reading the csv files from the correct folder. 
@@ -158,8 +163,8 @@ workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.9
 setwd(workingDir_IBM)
 allScenarioFiles <- list.files(pattern="*.csv")
 
-## what is probability that simulation results in extinction?
-## see how many times final population is less than 0 (in last row of temp matrix or in all years of the projection?)
+## Calculate the probability that a simulation results in extinction at the end of 50 years. 
+## Calculate the probability that the population reaches at least 50 individuals within 50 years.
 
 prob_50years <- data.frame(scenario = as.factor(LETTERS[1:length(allScenarioFiles)]), 
                            probNe_50 = NA, 
