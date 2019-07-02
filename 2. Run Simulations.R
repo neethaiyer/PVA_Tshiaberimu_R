@@ -209,6 +209,9 @@ for (i in 1:length(allScenarioFiles)){
          read.csv(paste(workingDir, allScenarioFiles[i], sep=''), header=TRUE)
   )}
 
+########## IMPORTANT !!!!!! #########
+########## IMPORTANT !!!!!! #########
+########## IMPORTANT !!!!!! #########
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
 stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
 ##stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
