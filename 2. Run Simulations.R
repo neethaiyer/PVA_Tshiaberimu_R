@@ -252,7 +252,7 @@ growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]),
 index<-0
 for(j in 1:9){
   index <- index+1
-  finalPop <- get(finalPopObjects[5]) ## here, j indicates which csv file to read
+  finalPop <- get(finalPopObjects[4]) ## here, j indicates which csv file to read
   logLambda <- (1/50)*log(index/mean(finalPop[,j])) ## 50 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
   lambda <- exp(logLambda)
   growthRates[index,2:3] <- c(logLambda, lambda)

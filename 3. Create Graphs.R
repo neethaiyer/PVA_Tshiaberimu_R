@@ -154,9 +154,16 @@ dev.off()
 ########################################
 
 ## Select file name:
-file_name <- "FigS1_LM_Projections.pdf"
+file_name <- "FigS1_LM_Projections_MTN3.pdf"
+##file_name <- "FigS1_LM_Projections_MTN2.pdf"
+##file_name <- "FigS1_LM_Projections_MTN1.pdf"
+##file_name <- "FigS1_LM_Projections_WLG.pdf"
 
-probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_3%.csv")
+## Select exticntion risk files:
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_3%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_2%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_1%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_WLG.csv")
 
 ## Select the correct folder for either WLG or MTN data
 workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
@@ -204,9 +211,17 @@ dev.off()
 ########################################
 
 ## Select file name:
-file_name <- "FigS2_IBM_Projections.pdf"
+file_name <- "FigS2_IBM_Projections_MTN3.pdf"
+##file_name <- "FigS2_IBM_Projections_MTN2.pdf"
+##file_name <- "FigS2_IBM_Projections_MTN1.pdf"
+##file_name <- "FigS2_IBM_Projections_WLG.pdf"
 
+
+## Select exticntion risk files:
 probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_3%.csv")
+##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_2%.csv")
+##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_1%.csv")
+##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_WLG.csv")
 
 ## Select the correct folder for either WLG or MTN data
 workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/")
