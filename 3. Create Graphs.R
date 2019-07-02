@@ -327,3 +327,39 @@ axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size 
 axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 dev.off()
+
+#####################################################################################
+################ Historical population trends for Tshiaberimu gorillas ##############
+#####################################################################################
+
+## Select file name:
+file_name <- "Fig1_HistoricalTshiaberimuPop.pdf"
+
+## Take a look at the historical population trajectories using Tshiaberimu census data
+year <- c(1959,1986,1995,1996,2003,2004,2006,2007,2008,2009,2011,2012,2013,2016,2017) ## census years
+numyears <- 1959:2017 ## census time period
+N <- c(35,20,17,16,20,20,21,22,18,16,6,6,7,6,6) ## census data
+
+## let's look at the rate of change in this population
+## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
+logLambda <- (1/58)*log(6/35) ## 58 years for the census time period, lambda = 1/timeperiod*log(Ntfinal)/Nt0
+lambda <- exp(logLambda)
+popEst <- 35*(exp(logLambda))^(0:58) ## this is the expected rate of change in the population given Ntfinal and Nt0
+popEst ## these are the predicted population estimates given the calculated lambda value
+
+## let's fit these parameter estimates to a linear model to calculate the r and lambda values to get a more accurate estimate of these parameters:
+modelGeom <- lm(log(N)~year) ## should be linear on a log scale
+r_lm <- modelGeom$coef[2] ## take the slope of the line from this linear model for the intrinsic rate of growth r=-0.0289175
+lambda_lm <- exp(modelGeom$coef[2]) ## lambda=0.9714966
+popEst_lm <- 35*(exp(r_lm))^(0:58)
+
+pdf(file_name, width=5,height=5)
+## plot the actual population sizes from census data and the expected population size:
+plot(year, N, xlab="Census Year", 
+     ylab="Estimated population size, N", 
+     pch=19, type="o",
+     ylim=c(0,50), 
+     xlim=c(numyears[1],numyears[length(numyears)]), 
+     las=1, cex.main=0.8, cex.lab=0.8, cex.axis=0.8, font.lab=2)
+lines(numyears, popEst_lm, col=2, lty=2, lwd=2)
+dev.off()
