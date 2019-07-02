@@ -193,11 +193,11 @@ write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_MTN_3%
 ###############################################################################
 
 ## Select the correct folder for either WLG or MTN data
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99")
+##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
-workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
+##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
@@ -223,7 +223,7 @@ for(j in 1:length(stochObjects)){
   Nfinal[,j] <- as.numeric(resX[nrow(resX),])
 }
 
-write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.99_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.99_IBM.csv"), row.names=F)
 ##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.85_IBM.csv"), row.names=F)
 ##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.65_IBM.csv"), row.names=F)
 ##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_wlg0.42_IBM.csv"), row.names=F)
@@ -252,7 +252,7 @@ growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]),
 index<-0
 for(j in 1:9){
   index <- index+1
-  finalPop <- get(finalPopObjects[1]) ## here, j indicates which csv file to read
+  finalPop <- get(finalPopObjects[5]) ## here, j indicates which csv file to read
   logLambda <- (1/50)*log(index/mean(finalPop[,j])) ## 50 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
   lambda <- exp(logLambda)
   growthRates[index,2:3] <- c(logLambda, lambda)
