@@ -175,6 +175,7 @@ for (i in 1:length(allScenarioFiles)){
 stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
 detObjects <- c("LM_Det_Scenario1.csv","LM_Det_Scenario2.csv","LM_Det_Scenario3.csv","LM_Det_Scenario4.csv", "LM_Det_Scenario5.csv","LM_Det_Scenario6.csv","LM_Det_Scenario7.csv","LM_Det_Scenario8.csv","LM_Det_Scenario9.csv")
 
+setwd(workingDir)
 pdf(file_name, width=10,height=10)
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
@@ -225,6 +226,7 @@ stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","I
 
 timeunit <- 1/12 ## time interval for the plots
 
+setwd(workingDir)
 pdf(file_name, width=10,height=10) 
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
