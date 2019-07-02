@@ -149,7 +149,7 @@ for(j in 1:length(initalConditions)){
 }
 
 ###############################################################################
-################ CALCULATE LIKELIHOOD OF EXTINCTION & Pop = 50 ################
+################ CALCULATE RISK OF EXTINCTION & Prob Pop = 50 #################
 ###############################################################################
 
 ### Now that the csv files have been written, we may not want to re-run the code for as long in the future, so we can just read the generated files and plot the data directly. Make sure you're reading the csv files from the correct folder. 
@@ -187,3 +187,47 @@ write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_MTN_3%
 #write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_MTN_1%.csv"), row.names=F)
 #write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_WLG.csv"), row.names=F)
 
+###############################################################################
+################# CREATE CSV FILES FOR FINAL POPULATION SIZES #################
+###############################################################################
+
+## Select the correct folder for either WLG or MTN data
+workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/")
+##workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
+##workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
+##workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
+##workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
+##workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
+##workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
+##workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
+
+setwd(workingDir)
+allScenarioFiles <- list.files(pattern="*.csv")
+for (i in 1:length(allScenarioFiles)){
+  assign(allScenarioFiles[i], 
+         read.csv(paste(workingDir, allScenarioFiles[i], sep=''), header=TRUE)
+  )}
+
+## Select simulation objects from list:
+##stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
+stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
+
+Nfinal <- data.frame(matrix(ncol=9, nrow=1000))
+colnames(Nfinal) <- LETTERS[1:9]
+
+index <- 0
+for(j in 1:length(stochObjects)){
+  index<-index+1
+  resX <- get(stochObjects[j])
+  Nfinal[,j] <- as.numeric(resX[nrow(resX),])
+}
+
+workingDir <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/")
+write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn0.99_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn0.85_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn0.65_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_wlg0.42_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn3%_LM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn2%_LM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn1%_LM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_wlg_LM.csv"), row.names=F)

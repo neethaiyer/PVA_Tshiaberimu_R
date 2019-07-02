@@ -33,6 +33,16 @@ mtn_3per_ibm <- read.csv(paste0(workingDir_Results,"extn_ibm_MTN_3%.csv"))
 mtn_2per_ibm <- read.csv(paste0(workingDir_Results,"extn_ibm_MTN_2%.csv"))
 mtn_1per_ibm <- read.csv(paste0(workingDir_Results,"extn_ibm_MTN_1%.csv"))
 
+## final population sizes
+finalPop1 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn0.99_IBM.csv"))
+finalPop2 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn0.85_IBM.csv"))
+finalPop3 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn0.65_IBM.csv"))
+finalPop4 <- read.csv(paste0(workingDir_Results,"Nfinal_wlg0.42_IBM.csv"))
+finalPop5 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn3%_LM.csv"))
+finalPop6 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn2%_LM.csv"))
+finalPop7 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn1%_LM.csv"))
+finalPop8 <- read.csv(paste0(workingDir_Results,"Nfinal_wlg_LM.csv"))
+
 ########################################
 ######## DEMOGRAPHIC PYRAMIDS ##########
 ########################################
@@ -57,16 +67,25 @@ n_wlg <- n/(sum(n))
 ## for the cumulative survival curve:
 n_wlgCS <- n/n[1]
 
+## Select file name:
+file_name <- "Fig2a_demographic_pyramid.pdf"
+
+pdf(file_name, width=5,height=8)
 ## Dem Pyramid for MTN with 3%, 2% and 1% growth rate
 barplot(n_mtn, horiz=T, names.arg=paste0(0:(length(n_mtn)-1), "-", 1:length(n_mtn)), las=1, xlab="Relative frequency", col=colMTN3, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, xlim=c(0,0.07))
 
 ## Dem Pyramid for WLG
 barplot(n_wlg, horiz=T, names.arg=paste0(0:(length(n_wlg)-1), "-", 1:length(n_wlg)), las=1, xlab="Relative frequency", col=coral, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, add=TRUE)
+dev.off()
 
 ########################################
 ###### CUMULATIVE SURVIVAL PLOTS #######
 ########################################
 
+## Select file name:
+file_name <- "Fig2b_survival_plots.pdf"
+
+pdf(file_name, width=8,height=5)
 par(mfrow=c(1,2), oma=c(4,1,1,1), mar=c(5,4,2,1))
 plot(dat[,c(1,2)], type="o", bty="l", xlab="Age", ylab="Annual mortality", las=1, bg=colMTN3, cex.lab=0.8, cex.axis=0.8, ylim=c(0,1), cex=0.8, cex.lab=0.8, font.lab=2, pch=24)
 lines(dat[,c(1,4)], type="o", bty="l", xlab="Age", ylab="Annual mortality", las=1, bg=colWLG, cex.lab=0.8, cex.axis=0.8, ylim=c(0,1), cex=0.8, cex.lab=0.8, font.lab=2, pch=21)
@@ -77,14 +96,19 @@ par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
 plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
 legend("bottom", legend=c("Mountain Gorillas", "Western Lowland Gorillas"),
        pt.bg=c(colMTN3, colWLG), lty=c(1,1), cex=0.8, text.font=2, pch=c(24,21), xpd = TRUE, horiz = FALSE, inset = c(0, 0.05), bty = "y")
+dev.off()
 
 # xpd = TRUE tells R that it is OK to plot outside the region 
 # inset = c(x,y) tells R how to move the legend relative to the 'bottom' location
 
 #########################################
-##### EXTINCTION PROBABILITY PLOTS  #####
+######## EXTINCTION RISK PLOTS  #########
 #########################################
 
+## Select file name:
+file_name <- "Fig4_extn_risk_LM.pdf"
+
+pdf(file_name, width=6,height=6)
 plot.new()
 par(mfrow=c(1,1), oma=c(4,1,1,1), mar=c(5,4,2,1))
 plot.window(xlim=c(1,9), ylim=c(0,100))
@@ -101,7 +125,12 @@ par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
 plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
 legend("bottom", legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
        pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(1,1,1,1), text.font=2, pch=c(21,22,23,24), cex=0.6, xpd = TRUE, horiz = FALSE, inset = c(0, 0.01), bty = "y")
+dev.off()
 
+## Select file name:
+file_name <- "Fig4_extn_risk_IBM.pdf"
+
+pdf(file_name, width=6,height=6)
 plot.new()
 par(mfrow=c(1,1), oma=c(4,1,1,1), mar=c(5,4,2,1))
 plot.window(xlim=c(1,9), ylim=c(0,100))
@@ -118,10 +147,14 @@ par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
 plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
 legend("bottom", legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3%"),
        pt.bg=c("#FF7F50", "#D58363","#AC8777","#838B8B"), lty=c(2,2,2,2), text.font=2, pch=c(21,22,23,24), cex=0.6, xpd = TRUE, horiz = FALSE, inset = c(0, 0.01), bty = "y")
+dev.off()
 
 ########################################
 #### LESLIE MATRIX PROJECTION PLOTS ####
 ########################################
+
+## Select file name:
+file_name <- "FigS1_LM_Projections.pdf"
 
 probExt_lm <- read.csv("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_3%.csv")
 
@@ -142,12 +175,11 @@ for (i in 1:length(allScenarioFiles)){
 stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
 detObjects <- c("LM_Det_Scenario1.csv","LM_Det_Scenario2.csv","LM_Det_Scenario3.csv","LM_Det_Scenario4.csv", "LM_Det_Scenario5.csv","LM_Det_Scenario6.csv","LM_Det_Scenario7.csv","LM_Det_Scenario8.csv","LM_Det_Scenario9.csv")
 
+pdf(file_name, width=10,height=10)
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
 time <- 0:50 ## time interval for the plots
-
-pdf("LM_Projections.pdf", width=6,height=4) 
-for(j in 1:9){
+for(j in 1:length(stochObjects)){
   probExt <- probExt_lm[j,3]
   scenario <- as.character(probExt_lm[j,1])
   tempX <- get(stochObjects[j])
@@ -170,6 +202,9 @@ dev.off()
 ######### IBM PROJECTION PLOTS #########
 ########################################
 
+## Select file name:
+file_name <- "FigS2_IBM_Projections.pdf"
+
 probExt_ibm <- read.csv("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_3%.csv")
 
 ## Select the correct folder for either WLG or MTN data
@@ -188,19 +223,19 @@ for (i in 1:length(allScenarioFiles)){
 
 stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
 
-par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
-maxY <- 120 ## max y-axis value
 timeunit <- 1/12 ## time interval for the plots
 
-pdf("IBM_Projections.pdf", width=6,height=4) 
-for(j in 1:9){
+pdf(file_name, width=10,height=10) 
+par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
+maxY <- 120 ## max y-axis value
+for(j in 1:length(stochObjects)){
   probExt <- probExt_ibm[j,3]
   scenario <- as.character(probExt_ibm[j,1])
   resX <- get(stochObjects[j])
   
   plot((0:(nrow(resX)-1))*timeunit, apply(resX, 1, mean), type="l", col=2, lwd=2, xlab="Years post-introduction", ylab="Population size", font.lab=2, bty="l", ylim=c(0,120))
   for(i in 1:ncol(resX)){
-    lines((0:(nrow(resX)-1))*timeunit, resX[,i], col=grey(.9))
+    lines((0:(nrow(resX)-1))*timeunit, resX[,i], col=grey(.8, alpha=.05), lwd=3)
   }
   
   ## add mean trend
@@ -216,4 +251,77 @@ for(j in 1:9){
   ## add a line for the 50 individual mark
   lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
 }
+dev.off()
+
+########################################
+######## FINAL POPULATION SIZES ########
+########################################
+setwd(workingDir)
+
+## Select file name:
+file_name <- "Fig5_FinalPopSize_IBM.pdf"
+
+pdf(file_name, width=8,height=8)
+par(mfrow=c(2,2))
+boxplot(finalPop1$A, finalPop1$B, finalPop1$C, finalPop1$D, finalPop1$E, finalPop1$F, finalPop1$G, finalPop1$H, finalPop1$I, pch=24, col=colMTN3, bg=colMTN3, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+
+boxplot(finalPop2$A, finalPop2$B, finalPop2$C, finalPop2$D, finalPop2$E, finalPop2$F, finalPop2$G, finalPop2$H, finalPop2$I, pch=23, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+
+boxplot(finalPop3$A, finalPop3$B, finalPop3$C, finalPop3$D, finalPop3$E, finalPop3$F, finalPop3$G, finalPop3$H, finalPop3$I, pch=22, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+
+boxplot(finalPop4$A, finalPop4$B, finalPop4$C, finalPop4$D, finalPop4$E, finalPop4$F, finalPop4$G, finalPop4$H, finalPop4$I, pch=21, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+dev.off()
+
+## Select file name:
+file_name <- "Fig5_FinalPopSize_LM.pdf"
+
+pdf(file_name, width=8,height=8)
+par(mfrow=c(2,2))
+boxplot(finalPop5$A, finalPop5$B, finalPop5$C, finalPop5$D, finalPop5$E, finalPop5$F, finalPop5$G, finalPop5$H, finalPop5$I, pch=24, col=colMTN3, bg=colMTN3, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+
+boxplot(finalPop6$A, finalPop6$B, finalPop6$C, finalPop6$D, finalPop6$E, finalPop6$F, finalPop6$G, finalPop6$H, finalPop6$I, pch=23, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+
+boxplot(finalPop7$A, finalPop7$B, finalPop7$C, finalPop7$D, finalPop7$E, finalPop7$F, finalPop7$G, finalPop7$H, finalPop7$I, pch=22, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+
+boxplot(finalPop8$A, finalPop8$B, finalPop8$C, finalPop8$D, finalPop8$E, finalPop8$F, finalPop8$G, finalPop8$H, finalPop8$I, pch=21, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
+par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
+axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
+axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
+title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 dev.off()
