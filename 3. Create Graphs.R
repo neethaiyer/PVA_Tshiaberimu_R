@@ -342,7 +342,7 @@ N <- c(35,20,17,16,20,20,21,22,18,16,6,6,7,6,6) ## census data
 
 ## let's look at the rate of change in this population
 ## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
-logLambda <- (1/58)*log(6/35) ## 58 years for the census time period, lambda = 1/timeperiod*log(Ntfinal)/Nt0
+logLambda <- (1/58)*log(6/35) ## 58 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
 lambda <- exp(logLambda)
 popEst <- 35*(exp(logLambda))^(0:58) ## this is the expected rate of change in the population given Ntfinal and Nt0
 popEst ## these are the predicted population estimates given the calculated lambda value

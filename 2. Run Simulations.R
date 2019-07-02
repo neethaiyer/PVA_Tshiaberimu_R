@@ -240,7 +240,7 @@ setwd(workingDir_Results)
 allScenarioFiles <- list.files(pattern="*.csv")
 for (i in 1:length(allScenarioFiles)){
   assign(allScenarioFiles[i], 
-         read.csv(paste(workingDir, allScenarioFiles[i], sep=''), header=TRUE)
+         read.csv(paste(workingDir_Results, allScenarioFiles[i], sep=''), header=TRUE)
   )}
 
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
@@ -252,12 +252,10 @@ growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]),
 index<-0
 for(j in 1:9){
   index <- index+1
-  finalPop <- get(finalPopObjects[5]) ## here, j indicates which csv file to read
-  logLambda <- (1/50)*log(1/mean(finalPop[,j])) ## 50 years for the census time period, lambda = 1/timeperiod*log(Ntfinal)/Nt0
+  finalPop <- get(finalPopObjects[1]) ## here, j indicates which csv file to read
+  logLambda <- (1/50)*log(index/mean(finalPop[,j])) ## 50 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
   lambda <- exp(logLambda)
-  r <- log(lambda)
-  growthRates[index,2] <- r
-  growthRates[index,3] <- lambda
+  growthRates[index,2:3] <- c(logLambda, lambda)
 }
 
 growthRates
