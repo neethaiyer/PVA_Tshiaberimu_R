@@ -1,7 +1,7 @@
 ## Set the working directory:
-workingDir <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/"
+workingDir <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/"
 setwd(workingDir)
-workingDir_Results <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/"
+workingDir_Results <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/"
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
 ## Let's pick our colors for MTN and WLG and include a transparency factor; note that these are only used for the bargraph below:
@@ -156,13 +156,13 @@ dev.off()
 ## Select file name:
 file_name <- "FigS1_LM_Projections.pdf"
 
-probExt_lm <- read.csv("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_3%.csv")
+probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_3%.csv")
 
 ## Select the correct folder for either WLG or MTN data
-workingDir_LM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/"
-##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
-##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
-##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
+workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
 
 setwd(workingDir_LM)
 allScenarioFiles <- list.files(pattern="*.csv")
@@ -205,13 +205,13 @@ dev.off()
 ## Select file name:
 file_name <- "FigS2_IBM_Projections.pdf"
 
-probExt_ibm <- read.csv("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_3%.csv")
+probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_3%.csv")
 
 ## Select the correct folder for either WLG or MTN data
-workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/"
-##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
-##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
-##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
+workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/")
+##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
+##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
+##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
 
 setwd(workingDir_IBM)
 allScenarioFiles <- list.files(pattern="*.csv")
