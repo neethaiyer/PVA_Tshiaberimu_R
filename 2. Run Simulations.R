@@ -1,6 +1,7 @@
 ## Set the working directory:
 workingDir <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/"
 setwd(workingDir)
+workingDir_Results <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/")
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
 ## Source the functions used in simulations below:
@@ -192,11 +193,11 @@ write.csv(prob_50years, file=paste0(workingDir,"pva_extn_results/extn_ibm_MTN_3%
 ###############################################################################
 
 ## Select the correct folder for either WLG or MTN data
-workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99")
+##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
+workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
 ##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
@@ -208,7 +209,7 @@ for (i in 1:length(allScenarioFiles)){
          read.csv(paste(workingDir, allScenarioFiles[i], sep=''), header=TRUE)
   )}
 
-## Select simulation objects from list:
+## Select simulation objects from list. Uncommented depending on whether IBM or LM:
 stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
 ##stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
 
@@ -222,12 +223,41 @@ for(j in 1:length(stochObjects)){
   Nfinal[,j] <- as.numeric(resX[nrow(resX),])
 }
 
-workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/")
-write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn0.99_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn0.85_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn0.65_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_wlg0.42_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn3%_LM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn2%_LM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_mtn1%_LM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir,"Nfinal_wlg_LM.csv"), row.names=F)
+write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.99_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.85_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.65_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_wlg0.42_IBM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn3%_LM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn2%_LM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn1%_LM.csv"), row.names=F)
+##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_wlg_LM.csv"), row.names=F)
+
+###############################################################################
+################### CALCULATE GROWTH RATE R FOR EACH MODEL ####################
+###############################################################################
+setwd(workingDir_Results)
+
+allScenarioFiles <- list.files(pattern="*.csv")
+for (i in 1:length(allScenarioFiles)){
+  assign(allScenarioFiles[i], 
+         read.csv(paste(workingDir, allScenarioFiles[i], sep=''), header=TRUE)
+  )}
+
+## Select simulation objects from list. Uncommented depending on whether IBM or LM:
+finalPopObjects <- c("Nfinal_mtn0.99_IBM.csv","Nfinal_mtn0.85_IBM.csv","Nfinal_mtn0.65_IBM.csv","Nfinal_wlg0.42_IBM.csv","Nfinal_mtn3%_LM.csv","Nfinal_mtn2%_LM.csv","Nfinal_mtn1%_LM.csv","Nfinal_wlg_LM.csv")
+
+## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
+growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]), 
+                           growth_rate = NA, lambda = NA)
+index<-0
+for(j in 1:9){
+  index <- index+1
+  finalPop <- get(finalPopObjects[5]) ## here, j indicates which csv file to read
+  logLambda <- (1/50)*log(1/mean(finalPop[,j])) ## 50 years for the census time period, lambda = 1/timeperiod*log(Ntfinal)/Nt0
+  lambda <- exp(logLambda)
+  r <- log(lambda)
+  growthRates[index,2] <- r
+  growthRates[index,3] <- lambda
+}
+
+growthRates
