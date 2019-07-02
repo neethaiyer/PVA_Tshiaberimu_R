@@ -58,10 +58,10 @@ n_wlg <- n/(sum(n))
 n_wlgCS <- n/n[1]
 
 ## Dem Pyramid for MTN with 3%, 2% and 1% growth rate
-barplot(n_mtn, horiz=T, names.arg=paste0(0:(length(n_mtn)-1), "-", 1:length(n_mtn)), las=1, xlab="relative frequency", col=colMTN3, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, xlim=c(0,0.07))
+barplot(n_mtn, horiz=T, names.arg=paste0(0:(length(n_mtn)-1), "-", 1:length(n_mtn)), las=1, xlab="Relative frequency", col=colMTN3, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, xlim=c(0,0.07))
 
 ## Dem Pyramid for WLG
-barplot(n_wlg, horiz=T, names.arg=paste0(0:(length(n_wlg)-1), "-", 1:length(n_wlg)), las=1, xlab="relative frequency", col=coral, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, add=TRUE)
+barplot(n_wlg, horiz=T, names.arg=paste0(0:(length(n_wlg)-1), "-", 1:length(n_wlg)), las=1, xlab="Relative frequency", col=coral, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, add=TRUE)
 
 ########################################
 ###### CUMULATIVE SURVIVAL PLOTS #######
@@ -91,7 +91,7 @@ plot.window(xlim=c(1,9), ylim=c(0,100))
 axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
-title(xlab="Reintroduction Scenario", ylab="Likelihood of Extinction (LM)", font.lab=2)
+title(xlab="Reintroduction Scenario", ylab="Extinction Risk (LM)", font.lab=2)
 lines(wlg_lm$scenario, wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
 lines(mtn_1per_lm$scenario, mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
 lines(mtn_2per_lm$scenario, mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
@@ -108,7 +108,7 @@ plot.window(xlim=c(1,9), ylim=c(0,100))
 axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
-title(xlab="Reintroduction Scenario", ylab="Likelihood of Extinction (IBM)", font.lab=2)
+title(xlab="Reintroduction Scenario", ylab="Extinction Risk (IBM)", font.lab=2)
 lines(wlg_ibm$scenario, wlg_ibm$prob_Extn, bg="#FF7F50", type="b", pch=21, lty=2)
 lines(mtn_1per_ibm$scenario, mtn_1per_ibm$prob_Extn, bg="#D58363", type="b", pch=22, lty=2)
 lines(mtn_2per_ibm$scenario, mtn_2per_ibm$prob_Extn, bg="#AC8777", type="b", pch=23, lty=2)
@@ -123,28 +123,97 @@ legend("bottom", legend=c("Western Gorillas", "Mountain Gorillas - 1%", "Mountai
 #### LESLIE MATRIX PROJECTION PLOTS ####
 ########################################
 
-simObjects <- c("tempA", "tempB", "tempC", "tempD", "tempE", "tempF", "tempG", "tempH", "tempI")
-detObjects <- c("N_projected_detA", "N_projected_detB", "N_projected_detC", "N_projected_detD", "N_projected_detE", "N_projected_detF", "N_projected_detG", "N_projected_detH", "N_projected_detI")
-probExt_lm <- prob_50years_mtn_lm
+probExt_lm <- read.csv("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_3%.csv")
+
+## Select the correct folder for either WLG or MTN data
+workingDir_LM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/"
+##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
+##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
+##workingDir_LM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
+
+setwd(workingDir_LM)
+allScenarioFiles <- list.files(pattern="*.csv")
+
+for (i in 1:length(allScenarioFiles)){
+  assign(allScenarioFiles[i], 
+         read.csv(paste(workingDir_LM, allScenarioFiles[i], sep=''), header=TRUE)
+  )}
+
+stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
+detObjects <- c("LM_Det_Scenario1.csv","LM_Det_Scenario2.csv","LM_Det_Scenario3.csv","LM_Det_Scenario4.csv", "LM_Det_Scenario5.csv","LM_Det_Scenario6.csv","LM_Det_Scenario7.csv","LM_Det_Scenario8.csv","LM_Det_Scenario9.csv")
 
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
 time <- 0:50 ## time interval for the plots
 
+pdf("LM_Projections.pdf", width=6,height=4) 
 for(j in 1:9){
-  ##probExt <- prob_50years_wlg_lm[j,6] ##uncomment this line for western gorilla demographic parameter simulations
-  probExt <- prob_50years_mtn_lm[j,6] ##uncomment this line for mountain gorilla demographic parameter simulations
-  tempX <- get(simObjects[j])
-  N_projected_detX <- get(detObjects[j])
+  probExt <- probExt_lm[j,3]
+  scenario <- as.character(probExt_lm[j,1])
+  tempX <- get(stochObjects[j])
+  N_projected_detX <- unname(unlist(get(detObjects[j])))
   plot(N_projected_detX~time, type="l", col=1, xlab="Years post-introduction", ylab="Population Size", ylim=c(0,maxY),lty=2, cex.lab=1, cex.axis=1, font.lab=2) ## plot of deterministic projection
   for(i in 1:ncol(tempX)){
     lines(time, tempX[,i], col=grey(.8, alpha=.05), lwd=3)
   } ## plots projections from stochastic LM simulations
   lines(apply(tempX, 1, mean)~time, type="l", col=2, lwd=4) ## plot mean projection from stochastic LM simulations
   lines(N_projected_detX~time, type="l", col=1, lwd=2, lty=2) ## replot deterministic projection
-  title(main="A: No introduction, male juvenile", sub=paste0("Probability of extinction = ",probExt, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
+  title(main=paste0("Scenario ",scenario), sub=paste0("Extinction Risk = ",probExt, "%"), cex.main=1, cex.sub=1, col.sub=1, font.sub=3)
   qtiles <- apply(tempX, 1, function(v) quantile(v, probs=c(0.05, 0.95))) ## plot 95% confidence intervals for simulations
   lines((0:(nrow(tempX)-1)), qtiles[1,], col=1, lty=2)
   lines((0:(nrow(tempX)-1)), qtiles[2,], col=1, lty=2)
   lines(x=c(-5:50), y=rep(50, 56), col="navyblue", lwd=2, lty=1) ## add a line for the 50 individual mark
 }
+dev.off()
+
+########################################
+######### IBM PROJECTION PLOTS #########
+########################################
+
+probExt_ibm <- read.csv("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_3%.csv")
+
+## Select the correct folder for either WLG or MTN data
+workingDir_IBM <- "~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/"
+##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
+##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
+##workingDir_IBM <- ("~/Box Sync/PVA_Paper/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
+
+setwd(workingDir_IBM)
+allScenarioFiles <- list.files(pattern="*.csv")
+
+for (i in 1:length(allScenarioFiles)){
+  assign(allScenarioFiles[i], 
+         read.csv(paste(workingDir_IBM, allScenarioFiles[i], sep=''), header=TRUE)
+  )}
+
+stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
+
+par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
+maxY <- 120 ## max y-axis value
+timeunit <- 1/12 ## time interval for the plots
+
+pdf("IBM_Projections.pdf", width=6,height=4) 
+for(j in 1:9){
+  probExt <- probExt_ibm[j,3]
+  scenario <- as.character(probExt_ibm[j,1])
+  resX <- get(stochObjects[j])
+  
+  plot((0:(nrow(resX)-1))*timeunit, apply(resX, 1, mean), type="l", col=2, lwd=2, xlab="Years post-introduction", ylab="Population size", font.lab=2, bty="l", ylim=c(0,120))
+  for(i in 1:ncol(resX)){
+    lines((0:(nrow(resX)-1))*timeunit, resX[,i], col=grey(.9))
+  }
+  
+  ## add mean trend
+  lines((0:(nrow(resX)-1))*timeunit, apply(resX, 1, mean), type="l", col=2, lwd=3)
+  
+  ## add 95% upper/lower limits
+  qtiles <- apply(resX, 1, function(v) quantile(v, probs=c(0.05, 0.95)))
+  lines((0:(nrow(resX)-1))*timeunit, qtiles[1,], lty=2)
+  lines((0:(nrow(resX)-1))*timeunit, qtiles[2,], lty=2)
+  
+  title(main=paste0("Scenario ",scenario), sub=paste0("Extinction Risk = ",probExt, "%"), cex.main=1, cex.sub=1, col.sub=1,  font.sub=3)
+  
+  ## add a line for the 50 individual mark
+  lines(x=c(-5:50), y=rep(50, 56), col="navy", lwd=2, lty=1)
+}
+dev.off()
