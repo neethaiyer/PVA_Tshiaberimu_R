@@ -249,14 +249,17 @@ for (i in 1:length(allScenarioFiles)){
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
 finalPopObjects <- c("Nfinal_mtn0.99_IBM.csv","Nfinal_mtn0.85_IBM.csv","Nfinal_mtn0.65_IBM.csv","Nfinal_wlg0.42_IBM.csv","Nfinal_mtn3%_LM.csv","Nfinal_mtn2%_LM.csv","Nfinal_mtn1%_LM.csv","Nfinal_wlg_LM.csv")
 
+startingPopObjects <- c("N40_mtn0.99_IBM.csv", "N40_mtn0.85_IBM.csv", "N40_mtn0.65_IBM.csv")
+
 ## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
 growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]), 
                            growth_rate = NA, lambda = NA)
 index<-0
 for(j in 1:9){
   index <- index+1
-  finalPop <- get(finalPopObjects[4]) ## here, j indicates which csv file to read
-  logLambda <- (1/50)*log(index/mean(finalPop[,j])) ## 50 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
+  finalPop <- get(finalPopObjects[3]) ## here, j indicates which csv file to read
+  startPop <- get(startingPopObjects[3])
+  logLambda <- mean((1/10)*log((finalPop[,j])/(startPop[,j]))) ## 50 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
   lambda <- exp(logLambda)
   growthRates[index,2:3] <- c(logLambda, lambda)
 }
