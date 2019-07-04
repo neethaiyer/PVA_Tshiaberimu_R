@@ -111,6 +111,6 @@ growthRates[17,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits
 growthRates <- growthRates[order(-growthRates$alpha_value),] 
 growthRates
 
-write.csv(growthRates, file=paste0("pva_projection_IBM","growthRates.csv"), row.names=F)
+write.csv(growthRates, file=paste0("pva_projection_IBM/growthRates.csv"), row.names=F)
 ## change row to 15 for next alpha
 

@@ -21,7 +21,7 @@ source("1. Function Definitions.R")
 ############################ READ LIFE HISTORY TABLE ###############################
 ####################################################################################
 
-dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv"))
+dat <- read.csv("Gorilla_LifeTables.csv")
 dat$fertilityrate_2percent <- dat[,3]*.786 
 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.01 which corresponds to a 1% growth rate
 dat$fertilityrate_1percent <- dat[,3]*.643 
@@ -31,21 +31,21 @@ dat$fertilityrate_1percent <- dat[,3]*.643
 ################# OPTIONAL: CREATE CSV FILES with LESLIE MATRICES ##################
 ####################################################################################
 
-leslieMatrix(lifetable=dat[,1:3], filename=paste0(workingDir,"LeslieMatrix_MTN_3%.csv"))
-leslieMatrix(lifetable=dat[,c(1:2, 6)], filename=paste0(workingDir,"LeslieMatrix_MTN_2%.csv"))
-leslieMatrix(lifetable=dat[,c(1:2, 7)], filename=paste0(workingDir,"LeslieMatrix_MTN_1%.csv"))
-leslieMatrix(lifetable=dat[,c(1, 4:5)], filename=paste0(workingDir,"LeslieMatrix_WLG.csv"))
+leslieMatrix(lifetable=dat[,1:3], filename="LeslieMatrix_MTN_3%.csv")
+leslieMatrix(lifetable=dat[,c(1:2, 6)], filename="LeslieMatrix_MTN_2%.csv")
+leslieMatrix(lifetable=dat[,c(1:2, 7)], filename="LeslieMatrix_MTN_1%.csv")
+leslieMatrix(lifetable=dat[,c(1, 4:5)], filename="LeslieMatrix_WLG.csv")
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
 ###############################################################################
 
 ## Reintroduction Scenarios:
-ReintroScenario <- read.csv(paste0(workingDir, "ReintroductionScenarios_LM.csv")) ## csv file with Reintroduction Scenarios for LM
-ReintroScenario_IBM <- read.csv(paste0(workingDir, "ReintroductionScenarios_IBM.csv")) ## csv file with Reintroduction Scenarios for IBM
+ReintroScenario <- read.csv("ReintroductionScenarios_LM.csv") ## csv file with Reintroduction Scenarios for LM
+ReintroScenario_IBM <- read.csv("ReintroductionScenarios_IBM.csv") ## csv file with Reintroduction Scenarios for IBM
 
 ## Time parameters:
-mat <- as.matrix(read.csv(paste0(workingDir, "LeslieMatrix_WLG.csv"))) ## csv file with appropriate Leslie Matrix (needs to be converted to matrix object!)
+mat <- as.matrix(read.csv("LeslieMatrix_MTN_2%.csv")) ## csv file with appropriate Leslie Matrix (needs to be converted to matrix object!)
 nyears <- 50 ## Projection Period
 nruns <- 1000 ## Number of simulations to run
 timeunit <- 1/12 ## timestep for IBM
@@ -55,7 +55,7 @@ datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
 weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
 adultAge <- 8 ## 10 for WLG, 8 for MTN
-alpha <- 0.99 ## function of the fertility rate, 0.99, 0.85 and 0.65 for MTN gorillas with 3%, 2%, and 1% growth rates and 0.42 for WLG growth rates. 
+alpha <- 0.35 ## function of the fertility rate
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
 initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
@@ -75,7 +75,7 @@ initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adult
     N <- pop_projection(tfinal=nyears, LM=mat, No=No) ## Apply pop_projection function to No for this scenario
     scenario <- strsplit(colnames(ReintroScenario)[i], "_")[[1]][2] ## Get the last element of the column name for each reintroducion scenario
     det <- assign(paste0("N_projected_det", scenario), apply(N,2,sum))  ## The assign function takes a variable name as a character string and assigns a value to it. In this case, the values are N at each time step of the projection
-    write.csv(det, file=paste0(workingDir, "pva_projection_LM/LM_Det_Scenario", i-1, ".csv"), row.names=F)
+    write.csv(det, file=paste0("pva_projection_LM/LM_Det_Scenario", i-1, ".csv"), row.names=F)
   }
 
 ## Second, use the stochastic function:
@@ -86,7 +86,7 @@ for(j in 1:length(ReintroScenario)){
   for(i in 1:nruns) {
     temp[1:(nyears+1),i] <- apply(stoch_projection(tfinal=nyears, LM=mat, No=ReintroScenario[,j+1]),2,sum)
   }
-  write.csv(temp, file=paste0(workingDir,"pva_projection_LM/LM_Scenario", j,".csv"), row.names=F)
+  write.csv(temp, file=paste0("pva_projection_LM/LM_Scenario", j,".csv"), row.names=F)
 }
 
 ###############################################################################
@@ -94,7 +94,7 @@ for(j in 1:length(ReintroScenario)){
 ###############################################################################
 ### Now that the csv files have been written, we may not want to re-run the code for as long in the future, so we can just read the generated files and plot the data directly. Make sure you're reading the csv files from the correct folder. 
 
-## Select the correct folder for either WLG or MTN data
+## Select the correct folder:
 workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
 ##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
 ##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
@@ -146,7 +146,7 @@ for(j in 1:length(initalConditions)){
     nindiv <- tapply(abmDataLog$status,abmDataLog$timestep, function(v) length(v)+rbinom(1, sum(v=="L"), .5))##we're adding the unweaned females
     res[1:length(nindiv),i] <- nindiv
   }
-  write.csv(res, file=paste0(workingDir,"pva_projection_IBM/IBM_Scenario", j,".csv"), row.names=F)
+  write.csv(res, file=paste0("pva_projection_IBM/IBM_Scenario", j,".csv"), row.names=F)
 }
 
 ###############################################################################
