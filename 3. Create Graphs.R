@@ -34,14 +34,14 @@ mtn_2per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_2%.csv"))
 mtn_1per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_1%.csv"))
 
 ## final population sizes
-finalPop1 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn0.99_IBM.csv"))
-finalPop2 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn0.85_IBM.csv"))
-finalPop3 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn0.65_IBM.csv"))
-finalPop4 <- read.csv(paste0(workingDir_Results,"Nfinal_wlg0.42_IBM.csv"))
-finalPop5 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn3%_LM.csv"))
-finalPop6 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn2%_LM.csv"))
-finalPop7 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn1%_LM.csv"))
-finalPop8 <- read.csv(paste0(workingDir_Results,"Nfinal_wlg_LM.csv"))
+finalPop1 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_MTN_3%.csv"))
+finalPop2 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_MTN_2%.csv"))
+finalPop3 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_MTN_1%.csv"))
+finalPop4 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_WLG.csv"))
+finalPop5 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_MTN_3%.csv"))
+finalPop6 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_MTN_2%.csv"))
+finalPop7 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_MTN_1%.csv"))
+finalPop8 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_WLG.cs"))
 
 ########################################
 ######## DEMOGRAPHIC PYRAMIDS ##########

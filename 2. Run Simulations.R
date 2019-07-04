@@ -211,33 +211,35 @@ write.csv(results_IBM, file="Results/extn_ibm_MTN_3%.csv", row.names=F)
 ###############################################################################
 ################# CREATE CSV FILES FOR FINAL POPULATION SIZES #################
 ###############################################################################
+setwd(workingDir_Output)
+## Select the correct folder for either LM or IBM:
+workingDir_LM <- "LM_Projection_50year_mtn_3%"
+##workingDir_LM <- "LM_Projection_50year_mtn_2%"
+##workingDir_LM <- "LM_Projection_50year_mtn_1%"
+##workingDir_LM <- "LM_Projection_50year_wlg"
+workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
+##workingDir_IBM <- "IBM_Projection_50year_wlg"
 
-## Select the correct folder for either WLG or MTN data
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_50year_mtn_3%/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_50year_mtn_2%/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_50year_mtn_1%/")
-##workingDir <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_50year_wlg/")
+setwd(workingDir_LM)
+##setwd(workingDir_IBM)
 
-setwd(workingDir)
 allScenarioFiles <- list.files(pattern="*.csv")
 for (i in 1:length(allScenarioFiles)){
   assign(allScenarioFiles[i], 
-         read.csv(paste(workingDir, allScenarioFiles[i], sep=''), header=TRUE)
+         read.csv(allScenarioFiles[i], header=TRUE)
   )}
 
 ########## IMPORTANT !!!!!! #########
 ########## IMPORTANT !!!!!! #########
 ########## IMPORTANT !!!!!! #########
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
-stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
-##stochObjects <- c("LM_Stoch_Scenario1.csv","LM_Stoch_Scenario2.csv","LM_Stoch_Scenario3.csv","LM_Stoch_Scenario4.csv","LM_Stoch_Scenario5.csv","LM_Stoch_Scenario6.csv","LM_Stoch_Scenario7.csv","LM_Stoch_Scenario8.csv","LM_Stoch_Scenario9.csv")
+stochObjects <- c("LM_Stoch_Scenario1.csv","LM_Stoch_Scenario2.csv","LM_Stoch_Scenario3.csv","LM_Stoch_Scenario4.csv","LM_Stoch_Scenario5.csv","LM_Stoch_Scenario6.csv","LM_Stoch_Scenario7.csv","LM_Stoch_Scenario8.csv","LM_Stoch_Scenario9.csv")
+##stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
 
-Nfinal <- data.frame(matrix(ncol=9, nrow=nruns))
-colnames(Nfinal) <- LETTERS[1:9]
+Nfinal <- data.frame(matrix(ncol=length(stochObjects), nrow=nruns))
+colnames(Nfinal) <- LETTERS[1:length(stochObjects)]
 
 index <- 0
 for(j in 1:length(stochObjects)){
@@ -246,28 +248,43 @@ for(j in 1:length(stochObjects)){
   Nfinal[,j] <- as.numeric(resX[nrow(resX),])
 }
 
-##write.csv(Nfinal, file="Nfinal_mtn0.99_IBM.csv", row.names=F)
-##write.csv(Nfinal, file="Nfinal_mtn0.85_IBM.csv", row.names=F)
-##write.csv(Nfinal, file="Nfinal_mtn0.65_IBM.csv", row.names=F)
-##write.csv(Nfinal, file="Nfinal_wlg0.42_IBM.csv", row.names=F)
-##write.csv(Nfinal, file="Nfinal_mtn3%_LM.csv", row.names=F)
-##write.csv(Nfinal, file="Nfinal_mtn2%_LM.csv", row.names=F)
-##write.csv(Nfinal, file="Nfinal_mtn1%_LM.csv", row.names=F)
-##write.csv(Nfinal, file="Nfinal_wlg_LM.csv", row.names=F)
+##write.csv(Nfinal, file="Results_LM_Nfinal_MTN_3%.csv", row.names=F)
+##write.csv(Nfinal, file="Results_LM_Nfinal_MTN_2%.csv", row.names=F)
+##write.csv(Nfinal, file="Results_LM_Nfinal_MTN_1%.csv", row.names=F)
+##write.csv(Nfinal, file="Results_LM_Nfinal_WLG.csv", row.names=F)
+##write.csv(Nfinal, file="Results_IBM_Nfinal_MTN_3%.csv", row.names=F)
+##write.csv(Nfinal, file="Results_IBM_Nfinal_MTN_2%.csv", row.names=F)
+##write.csv(Nfinal, file="Results_IBM_Nfinal_MTN_1%.csv", row.names=F)
+##write.csv(Nfinal, file="Results_IBM_Nfinal_WLG.csv", row.names=F)
 
 ###############################################################################
 ################### CALCULATE GROWTH RATE R FOR EACH MODEL ####################
 ###############################################################################
-setwd(workingDir_Results)
+setwd(workingDir_Output)
+## Select the correct folder for either LM or IBM:
+workingDir_LM <- "LM_Projection_50year_mtn_3%"
+##workingDir_LM <- "LM_Projection_50year_mtn_2%"
+##workingDir_LM <- "LM_Projection_50year_mtn_1%"
+##workingDir_LM <- "LM_Projection_50year_wlg"
+workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
+##workingDir_IBM <- "IBM_Projection_50year_wlg"
+
+setwd(workingDir_LM)
+##setwd(workingDir_IBM)
 
 allScenarioFiles <- list.files(pattern="*.csv")
 for (i in 1:length(allScenarioFiles)){
   assign(allScenarioFiles[i], 
-         read.csv(paste(allScenarioFiles[i], sep=''), header=TRUE)
+         read.csv(allScenarioFiles[i], header=TRUE)
   )}
 
+########## IMPORTANT !!!!!! #########
+########## IMPORTANT !!!!!! #########
+########## IMPORTANT !!!!!! #########
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
-finalPopObjects <- c("Nfinal_mtn0.99_IBM.csv","Nfinal_mtn0.85_IBM.csv","Nfinal_mtn0.65_IBM.csv","Nfinal_wlg0.42_IBM.csv","Nfinal_mtn3%_LM.csv","Nfinal_mtn2%_LM.csv","Nfinal_mtn1%_LM.csv","Nfinal_wlg_LM.csv")
+finalPopObjects <- c("Results_LM_Nfinal_MTN_3%.csv","Results_LM_Nfinal_MTN_2%.csv","Results_LM_Nfinal_MTN_1%.csv","Results_LM_Nfinal_WLG.csv","Results_IBM_Nfinal_MTN_3%.csv","Results_IBM_Nfinal_MTN_2%.csv","Results_IBM_Nfinal_MTN_2%.csv","Results_LM_Nfinal_WLG.csv")
 
 startingPopObjects <- c("N40_mtn0.99_IBM.csv", "N40_mtn0.85_IBM.csv", "N40_mtn0.65_IBM.csv")
 
