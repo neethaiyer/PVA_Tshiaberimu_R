@@ -24,14 +24,14 @@ colWLG <- "#FF7F50"
 ## Read all csv files:
 dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv")) ## life tables
 ## probability of extinctions based on LM projections
-wlg_lm <- read.csv(paste0(workingDir_Results,"extn_lm_WLG.csv"))
-mtn_3per_lm <- read.csv(paste0(workingDir_Results,"extn_lm_MTN_3%.csv"))
-mtn_2per_lm <- read.csv(paste0(workingDir_Results,"extn_lm_MTN_2%.csv"))
-mtn_1per_lm <- read.csv(paste0(workingDir_Results,"extn_lm_MTN_1%.csv"))
-wlg_ibm <- read.csv(paste0(workingDir_Results,"extn_ibm_WLG.csv"))
-mtn_3per_ibm <- read.csv(paste0(workingDir_Results,"extn_ibm_MTN_3%.csv"))
-mtn_2per_ibm <- read.csv(paste0(workingDir_Results,"extn_ibm_MTN_2%.csv"))
-mtn_1per_ibm <- read.csv(paste0(workingDir_Results,"extn_ibm_MTN_1%.csv"))
+wlg_lm <- read.csv(paste0(workingDir_Results,"Results_LM_WLG.csv"))
+mtn_3per_lm <- read.csv(paste0(workingDir_Results,"Results_LM_MTN_3%.csv"))
+mtn_2per_lm <- read.csv(paste0(workingDir_Results,"Results_LM_MTN_2%.csv"))
+mtn_1per_lm <- read.csv(paste0(workingDir_Results,"Results_LM_MTN_1%.csv"))
+wlg_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_WLG.csv"))
+mtn_3per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_3%.csv"))
+mtn_2per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_2%.csv"))
+mtn_1per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_1%.csv"))
 
 ## final population sizes
 finalPop1 <- read.csv(paste0(workingDir_Results,"Nfinal_mtn0.99_IBM.csv"))
@@ -116,10 +116,10 @@ axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
 title(xlab="Reintroduction Scenario", ylab="Extinction Risk (LM)", font.lab=2)
-lines(wlg_lm$scenario, wlg_lm$prob_Extn, bg="#FF7F50", type="b", pch=21)
-lines(mtn_1per_lm$scenario, mtn_1per_lm$prob_Extn, bg="#D58363", type="b", pch=22)
-lines(mtn_2per_lm$scenario, mtn_2per_lm$prob_Extn, bg="#AC8777", type="b", pch=23)
-lines(mtn_3per_lm$scenario, mtn_3per_lm$prob_Extn, bg="#838B8B", type="b", pch=24)
+lines(wlg_lm$scenario, wlg_lm$extn_Risk, bg="#FF7F50", type="b", pch=21)
+lines(mtn_1per_lm$scenario, mtn_1per_lm$extn_Risk, bg="#D58363", type="b", pch=22)
+lines(mtn_2per_lm$scenario, mtn_2per_lm$extn_Risk, bg="#AC8777", type="b", pch=23)
+lines(mtn_3per_lm$scenario, mtn_3per_lm$extn_Risk, bg="#838B8B", type="b", pch=24)
 
 par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
 plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
@@ -138,10 +138,10 @@ axis(1, 1:9, LETTERS[1:9])
 axis(2)
 axis(2, font.lab=2, at=seq(0, 100, by=10), labels=seq(0, 100, by=10))
 title(xlab="Reintroduction Scenario", ylab="Extinction Risk (IBM)", font.lab=2)
-lines(wlg_ibm$scenario, wlg_ibm$prob_Extn, bg="#FF7F50", type="b", pch=21, lty=2)
-lines(mtn_1per_ibm$scenario, mtn_1per_ibm$prob_Extn, bg="#D58363", type="b", pch=22, lty=2)
-lines(mtn_2per_ibm$scenario, mtn_2per_ibm$prob_Extn, bg="#AC8777", type="b", pch=23, lty=2)
-lines(mtn_3per_ibm$scenario, mtn_3per_ibm$prob_Extn, bg="#838B8B", type="b", pch=24, lty=2)
+lines(wlg_ibm$scenario, wlg_ibm$extn_Risk, bg="#FF7F50", type="b", pch=21, lty=2)
+lines(mtn_1per_ibm$scenario, mtn_1per_ibm$extn_Risk, bg="#D58363", type="b", pch=22, lty=2)
+lines(mtn_2per_ibm$scenario, mtn_2per_ibm$extn_Risk, bg="#AC8777", type="b", pch=23, lty=2)
+lines(mtn_3per_ibm$scenario, mtn_3per_ibm$extn_Risk, bg="#838B8B", type="b", pch=24, lty=2)
 
 par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
 plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
@@ -160,16 +160,16 @@ file_name <- "FigS1_LM_Projections_MTN3.pdf"
 ##file_name <- "FigS1_LM_Projections_WLG.pdf"
 
 ## Select exticntion risk files:
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_3%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_2%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_MTN_1%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_lm_WLG.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_MTN_3%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_MTN_2%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_MTN_1%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_WLG.csv")
 
 ## Select the correct folder for either WLG or MTN data
-workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_3%/")
-##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_2%/")
-##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_mtn_1%/")
-##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_LM_50year_wlg/")
+workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_mtn_3%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_mtn_2%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_mtn_1%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_wlg/")
 
 setwd(workingDir_LM)
 allScenarioFiles <- list.files(pattern="*.csv")
@@ -179,7 +179,7 @@ for (i in 1:length(allScenarioFiles)){
          read.csv(paste(workingDir_LM, allScenarioFiles[i], sep=''), header=TRUE)
   )}
 
-stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
+stochObjects <- c("LM_Stoch_Scenario1.csv","LM_Stoch_Scenario2.csv","LM_Stoch_Scenario3.csv","LM_Stoch_Scenario4.csv","LM_Stoch_Scenario5.csv","LM_Stoch_Scenario6.csv","LM_Stoch_Scenario7.csv","LM_Stoch_Scenario8.csv","LM_Stoch_Scenario9.csv")
 detObjects <- c("LM_Det_Scenario1.csv","LM_Det_Scenario2.csv","LM_Det_Scenario3.csv","LM_Det_Scenario4.csv", "LM_Det_Scenario5.csv","LM_Det_Scenario6.csv","LM_Det_Scenario7.csv","LM_Det_Scenario8.csv","LM_Det_Scenario9.csv")
 
 setwd(workingDir)
