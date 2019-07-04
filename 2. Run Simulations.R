@@ -216,7 +216,7 @@ for (i in 1:length(allScenarioFiles)){
 stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
 ##stochObjects <- c("LM_Scenario1.csv","LM_Scenario2.csv","LM_Scenario3.csv","LM_Scenario4.csv","LM_Scenario5.csv","LM_Scenario6.csv","LM_Scenario7.csv","LM_Scenario8.csv","LM_Scenario9.csv")
 
-Nfinal <- data.frame(matrix(ncol=9, nrow=1000))
+Nfinal <- data.frame(matrix(ncol=9, nrow=nruns))
 colnames(Nfinal) <- LETTERS[1:9]
 
 index <- 0
