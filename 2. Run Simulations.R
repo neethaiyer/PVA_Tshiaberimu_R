@@ -1,7 +1,7 @@
 ## Set the working directory:
 workingDir <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/"
 setwd(workingDir)
-workingDir_Results <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/")
+workingDir_Results <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/pva_extn_results/")
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
 ## Source the functions used in simulations below:
@@ -226,14 +226,14 @@ for(j in 1:length(stochObjects)){
   Nfinal[,j] <- as.numeric(resX[nrow(resX),])
 }
 
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.99_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.85_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn0.65_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_wlg0.42_IBM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn3%_LM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn2%_LM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_mtn1%_LM.csv"), row.names=F)
-##write.csv(Nfinal, file=paste0(workingDir_Results,"Nfinal_wlg_LM.csv"), row.names=F)
+##write.csv(Nfinal, file="Nfinal_mtn0.99_IBM.csv", row.names=F)
+##write.csv(Nfinal, file="Nfinal_mtn0.85_IBM.csv", row.names=F)
+##write.csv(Nfinal, file="Nfinal_mtn0.65_IBM.csv", row.names=F)
+##write.csv(Nfinal, file="Nfinal_wlg0.42_IBM.csv", row.names=F)
+##write.csv(Nfinal, file="Nfinal_mtn3%_LM.csv", row.names=F)
+##write.csv(Nfinal, file="Nfinal_mtn2%_LM.csv", row.names=F)
+##write.csv(Nfinal, file="Nfinal_mtn1%_LM.csv", row.names=F)
+##write.csv(Nfinal, file="Nfinal_wlg_LM.csv", row.names=F)
 
 ###############################################################################
 ################### CALCULATE GROWTH RATE R FOR EACH MODEL ####################
@@ -243,7 +243,7 @@ setwd(workingDir_Results)
 allScenarioFiles <- list.files(pattern="*.csv")
 for (i in 1:length(allScenarioFiles)){
   assign(allScenarioFiles[i], 
-         read.csv(paste(workingDir_Results, allScenarioFiles[i], sep=''), header=TRUE)
+         read.csv(paste(allScenarioFiles[i], sep=''), header=TRUE)
   )}
 
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
