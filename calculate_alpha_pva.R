@@ -88,7 +88,7 @@ growthRates <- data.frame(alpha_value = NA,
 timeunit<-1/12
 initalConditions <- convertToList(scenario = N_random, adultAge=adultAge, weaningAge=weaningAge) ## define initial conditions based on ages of females randomly sampled earlier in N_random
 nruns <- 10
-alpha <- 0.68 ## set alpha value
+alpha <- 0.50 ## set alpha value
 
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
 for(j in 1:length(initalConditions)){
@@ -107,8 +107,9 @@ startPop <- as.numeric(res[480,])
 
 logLambda <- mean((1/10)*log(finalPop/startPop)) ## nyears for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
 lambda <- exp(logLambda)
-growthRates[6,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
+growthRates[10,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
 growthRates
 
+## check
 growthRates <- growthRates[order(-growthRates$alpha_value),]
 
