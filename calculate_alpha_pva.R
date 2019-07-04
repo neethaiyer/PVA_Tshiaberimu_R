@@ -88,7 +88,7 @@ growthRates <- data.frame(alpha_value = NA,
 timeunit<-1/12
 initalConditions <- convertToList(scenario = N_random, adultAge=adultAge, weaningAge=weaningAge) ## define initial conditions based on ages of females randomly sampled earlier in N_random
 nruns <- 10
-alpha <- 0.28 ## set alpha value
+alpha <- 0.35 ## set alpha value
 
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
 for(j in 1:length(initalConditions)){
@@ -107,11 +107,10 @@ startPop <- as.numeric(res[480,])
 
 logLambda <- mean((1/10)*log(finalPop/startPop)) ## nyears for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
 lambda <- exp(logLambda)
-growthRates[14,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
+growthRates[17,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
+growthRates <- growthRates[order(-growthRates$alpha_value),] 
 growthRates
 
-## check
-growthRates <- growthRates[order(-growthRates$alpha_value),] 
-
+write.csv(growthRates, file=paste0("pva_projection_IBM","growthRates.csv"), row.names=F)
 ## change row to 15 for next alpha
 
