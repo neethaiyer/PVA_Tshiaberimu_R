@@ -53,7 +53,7 @@ ReintroScenario <- read.csv("ReintroductionScenarios_LM.csv") ## csv file with R
 mat <- as.matrix(selectLM) ## LM needs to be converted to matrix object!
 
 ## Time parameters:
-nyears <- 50 ## Projection Period
+nyears <- 100 ## Projection Period
 nruns <- 1000 ## Number of simulations to run
 timeunit <- 1/12 ## timestep for IBM
 
