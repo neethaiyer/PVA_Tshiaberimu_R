@@ -108,7 +108,7 @@ CP <- function(t, alpha) 1-exp(log(1-alpha)/(1/timeunit)) ## Probability for a c
 #################### FUNCTION 7: Transition from P to L ####################
 ############################################################################
 
-PL <- function(t) ifelse(t<(adultAge+0.5)/12, 0, 1) ## Probability for a pregnant adult female to transition to "lactating" is 1 if she has been pregnant for 8.5 months
+PL <- function(t) ifelse(t<8.5/12, 0, 1) ## Probability for a pregnant adult female to transition to "lactating" is 1 if she has been pregnant for 8.5 months
 
 #############################################################################
 #################### FUNCTION 8: Transition from L to C  ####################

@@ -80,7 +80,7 @@ growthRates <- data.frame(alpha_value = NA,
 timeunit<-1/12
 initalConditions <- convertToList(scenario = N_random, adultAge=adultAge, weaningAge=weaningAge) ## define initial conditions based on ages of females randomly sampled earlier in N_random
 nruns <- 10
-alpha <- 0.75 ## set alpha value
+alpha <- 0.70 ## set alpha value
 
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
 for(j in 1:length(initalConditions)){
@@ -93,16 +93,16 @@ for(j in 1:length(initalConditions)){
 }
 
 finalPop <- as.numeric(res[nrow(res),])
-startPop <- as.numeric(res[480,])
+startPop <- as.numeric(res[840,])
 ##startPop <- rep(100,nruns) ## if using No at t=0
 
 logLambda <- mean((1/10)*log(finalPop/startPop)) ## nyears for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
 lambda <- exp(logLambda)
-growthRates[13,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
+growthRates[2,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
 growthRates <- growthRates[order(-growthRates$alpha_value),] 
 growthRates
 
-write.csv(growthRates, file="growthRates_LM1%.csv", row.names=F)
+write.csv(growthRates, file="growthRates_LM2%_100yrs.csv", row.names=F)
 
 ## Examine how alpha and growth rate vary:
 growthRates2 <- read.csv("growthRates_LM2%.csv")
