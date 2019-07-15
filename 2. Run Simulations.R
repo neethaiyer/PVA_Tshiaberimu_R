@@ -56,7 +56,7 @@ leslieMatrix(lifetable=dat[,c(1, 4:5)], filename="LeslieMatrix_WLG.csv")
 ############## Create an object that selects the LM ##############
 ##################################################################
 
-selectLM <- read.csv("LeslieMatrix_MTN_2%.csv")
+selectLM <- read.csv("LeslieMatrix_MTN_1%.csv")
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
@@ -79,7 +79,7 @@ datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
 weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
 adultAge <- 8 ## 10 for WLG, 8 for MTN
-alpha <- 0.35 ## see "calculate_alpha_value.R" for more details
+alpha <- 0.60 ## see "calculate_alpha_value.R" for more details
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
 initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
@@ -121,9 +121,9 @@ for(j in 1:(length(ReintroScenario)-1)){
 
 setwd(workingDir_Output)
 ## Select the correct folder:
-workingDir_LM <- "LM_Projection_50year_mtn_3%"
+##workingDir_LM <- "LM_Projection_50year_mtn_3%"
 ##workingDir_LM <- "LM_Projection_50year_mtn_2%"
-##workingDir_LM <- "LM_Projection_50year_mtn_1%"
+workingDir_LM <- "LM_Projection_50year_mtn_1%"
 ##workingDir_LM <- "LM_Projection_50year_wlg"
 
 setwd(workingDir_LM)
@@ -146,9 +146,9 @@ for(i in 1:length(allScenarioFiles)){
 
 setwd(workingDir_Output)
 ## Write csv files to save the results:
-write.csv(results_LM, file="Results/Results_LM_MTN_3%.csv", row.names=F)
+##write.csv(results_LM, file="Results/Results_LM_MTN_3%.csv", row.names=F)
 ##write.csv(results_LM, file="Results/Results_LM_MTN_2%.csv", row.names=F)
-##write.csv(results_LM, file="Results/Results_LM_MTN_1%.csv", row.names=F)
+write.csv(results_LM, file="Results/Results_LM_MTN_1%.csv", row.names=F)
 ##write.csv(results_LM, file="Results/Results_LM_WLG.csv", row.names=F)
 
 #####################################################################################
