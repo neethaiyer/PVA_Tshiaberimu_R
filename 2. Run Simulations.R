@@ -56,7 +56,7 @@ leslieMatrix(lifetable=dat[,c(1, 4:5)], filename="LeslieMatrix_WLG.csv")
 ############## Create an object that selects the LM ##############
 ##################################################################
 
-selectLM <- read.csv("LeslieMatrix_MTN_1%.csv")
+selectLM <- read.csv("LeslieMatrix_WLG.csv")
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
@@ -75,11 +75,11 @@ nruns <- 1000 ## Number of simulations to run
 timeunit <- 1/12 ## timestep for IBM
 
 ## Initial demographic parameters: survivorship, fertility, and weaning age
-datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
+datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
-weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
-adultAge <- 8 ## 10 for WLG, 8 for MTN
-alpha <- 0.60 ## see "calculate_alpha_value.R" for more details
+weaningAge <- 4.5 ## 4.5 for WLG, 3.5 for MTN
+adultAge <- 10 ## 10 for WLG, 8 for MTN
+alpha <- 0.42 ## see "calculate_alpha_value.R" for more details
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
 initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
@@ -177,9 +177,9 @@ for(j in 1:length(initalConditions)){
 
 setwd(workingDir_Output)
 ## Select the correct folder:
-workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
-##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
+workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
 ##workingDir_IBM <- "IBM_Projection_50year_wlg"
 
 setwd(workingDir_IBM)
@@ -195,7 +195,7 @@ results_IBM <- data.frame(scenario = as.factor(LETTERS[1:length(allScenarioFiles
 index <- 0
 for(i in 1:length(allScenarioFiles)){
   index <- index+1
-  res <- as.matrix(read.csv(paste0(workingDir_IBM, allScenarioFiles[[i]])))
+  res <- as.matrix(read.csv(allScenarioFiles[[i]]))
   probNe_50 <- mean(res[nrow(res),]>=50)
   extn_Risk <- mean(res[nrow(res),]==0)
   results_IBM[index,2:3] <- c(probNe_50, extn_Risk)*100
@@ -203,10 +203,10 @@ for(i in 1:length(allScenarioFiles)){
 
 setwd(workingDir_Output)
 ## Write csv files to save the results:
-write.csv(results_IBM, file="Results/extn_ibm_MTN_3%.csv", row.names=F)
-#write.csv(results_IBM, file="Results/extn_ibm_MTN_2%.csv", row.names=F)
-#write.csv(results_IBM, file="Results/extn_ibm_MTN_1%.csv", row.names=F)
-#write.csv(results_IBM, file="Results/extn_ibm_WLG.csv", row.names=F)
+##write.csv(results_IBM, file="Results/Results_ibm_MTN_3%.csv", row.names=F)
+##write.csv(results_IBM, file="Results/Results_ibm_MTN_2%.csv", row.names=F)
+write.csv(results_IBM, file="Results/Results_ibm_MTN_1%.csv", row.names=F)
+#write.csv(results_IBM, file="Results/Results_ibm_WLG.csv", row.names=F)
 
 ###############################################################################
 ################# CREATE CSV FILES FOR FINAL POPULATION SIZES #################
@@ -262,10 +262,10 @@ for(j in 1:length(stochObjects)){
 ###############################################################################
 setwd(workingDir_Output)
 ## Select the correct folder for either LM or IBM:
-workingDir_LM <- "LM_Projection_50year_mtn_3%"
+##workingDir_LM <- "LM_Projection_50year_mtn_3%"
 ##workingDir_LM <- "LM_Projection_50year_mtn_2%"
 ##workingDir_LM <- "LM_Projection_50year_mtn_1%"
-##workingDir_LM <- "LM_Projection_50year_wlg"
+workingDir_LM <- "LM_Projection_50year_wlg"
 workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
@@ -286,7 +286,7 @@ for (i in 1:length(allScenarioFiles)){
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
 finalPopObjects <- c("Results_LM_Nfinal_MTN_3%.csv","Results_LM_Nfinal_MTN_2%.csv","Results_LM_Nfinal_MTN_1%.csv","Results_LM_Nfinal_WLG.csv","Results_IBM_Nfinal_MTN_3%.csv","Results_IBM_Nfinal_MTN_2%.csv","Results_IBM_Nfinal_MTN_2%.csv","Results_LM_Nfinal_WLG.csv")
 
-startingPopObjects <- c("N40_mtn0.99_IBM.csv", "N40_mtn0.85_IBM.csv", "N40_mtn0.65_IBM.csv")
+startingPopObjects <- c("Results_LM_N40_WLG.csv")
 
 ## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
 growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]), 
@@ -294,8 +294,8 @@ growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]),
 index<-0
 for(j in 1:9){
   index <- index+1
-  finalPop <- get(finalPopObjects[3]) ## here, j indicates which csv file to read
-  startPop <- get(startingPopObjects[3])
+  finalPop <- get(finalPopObjects[8]) ## here, j indicates which csv file to read
+  startPop <- get(startingPopObjects[1])
   logLambda <- mean((1/10)*log((finalPop[,j])/(startPop[,j]))) ## 50 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
   lambda <- exp(logLambda)
   growthRates[index,2:3] <- c(logLambda, lambda)
