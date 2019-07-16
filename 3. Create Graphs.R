@@ -1,8 +1,9 @@
 ## Set the working directory:
-workingDir <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R"
+workingDir <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/"
 setwd(workingDir)
-workingDir_Results <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/Results"
-workingDir_Input <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Input"
+workingDir_Output <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/"
+workingDir_Input <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Input/"
+workingDir_Figures <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Figures/"
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
 ## Let's pick our colors for MTN and WLG and include a transparency factor; note that these are only used for the bargraph below:
@@ -25,24 +26,24 @@ colWLG <- "#FF7F50"
 ## Read all csv files:
 dat <- read.csv(paste0(workingDir_Input, "Gorilla_LifeTables.csv")) ## life tables
 ## probability of extinctions based on LM projections
-wlg_lm <- read.csv(paste0(workingDir_Results,"Results_LM_WLG.csv"))
-mtn_3per_lm <- read.csv(paste0(workingDir_Results,"Results_LM_MTN_3%.csv"))
-mtn_2per_lm <- read.csv(paste0(workingDir_Results,"Results_LM_MTN_2%.csv"))
-mtn_1per_lm <- read.csv(paste0(workingDir_Results,"Results_LM_MTN_1%.csv"))
-wlg_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_WLG.csv"))
-mtn_3per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_3%.csv"))
-mtn_2per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_2%.csv"))
-mtn_1per_ibm <- read.csv(paste0(workingDir_Results,"Results_IBM_MTN_1%.csv"))
+mtn_3per_lm <- read.csv(paste0(workingDir_Output,"Results/Results_LM_mtn_3%.csv"))
+mtn_2per_lm <- read.csv(paste0(workingDir_Output,"Results/Results_LM_mtn_2%.csv"))
+mtn_1per_lm <- read.csv(paste0(workingDir_Output,"Results/Results_LM_mtn_1%.csv"))
+wlg_lm <- read.csv(paste0(workingDir_Output,"Results/Results_LM_wlg.csv"))
+mtn_3per_ibm <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_mtn_3%.csv"))
+mtn_2per_ibm <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_mtn_2%.csv"))
+mtn_1per_ibm <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_mtn_1%.csv"))
+wlg_ibm <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_wlg_0.42.csv"))
 
 ## final population sizes
-finalPop1 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_MTN_3%.csv"))
-finalPop2 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_MTN_2%.csv"))
-finalPop3 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_MTN_1%.csv"))
-finalPop4 <- read.csv(paste0(workingDir_Results,"Results_LM_Nfinal_WLG.csv"))
-finalPop5 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_MTN_3%.csv"))
-finalPop6 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_MTN_2%.csv"))
-finalPop7 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_MTN_1%.csv"))
-finalPop8 <- read.csv(paste0(workingDir_Results,"Results_IBM_Nfinal_WLG.cs"))
+finalPop1 <- read.csv(paste0(workingDir_Output,"Results/Results_LM_Nfinal_mtn_3%.csv"))
+finalPop2 <- read.csv(paste0(workingDir_Output,"Results/Results_LM_Nfinal_mtn_2%.csv"))
+finalPop3 <- read.csv(paste0(workingDir_Output,"Results/Results_LM_Nfinal_mtn_1%.csv"))
+finalPop4 <- read.csv(paste0(workingDir_Output,"Results/Results_LM_Nfinal_wlg.csv"))
+finalPop5 <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_Nfinal_mtn_3%.csv"))
+finalPop6 <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_Nfinal_mtn_2%.csv"))
+finalPop7 <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_Nfinal_mtn_1%.csv"))
+finalPop8 <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_Nfinal_wlg_0.42.csv"))
 
 ########################################
 ######## DEMOGRAPHIC PYRAMIDS ##########
@@ -71,6 +72,7 @@ n_wlgCS <- n/n[1]
 ## Select file name:
 file_name <- "Fig2a_demographic_pyramid.pdf"
 
+setwd(workingDir_Figures)
 pdf(file_name, width=5,height=8)
 ## Dem Pyramid for MTN with 3%, 2% and 1% growth rate
 barplot(n_mtn, horiz=T, names.arg=paste0(0:(length(n_mtn)-1), "-", 1:length(n_mtn)), las=1, xlab="Relative frequency", col=colMTN3, cex.axis = 1, cex.names = 0.7, ylab="Age", cex.lab=1, font.lab=2, xlim=c(0,0.07))
@@ -86,6 +88,7 @@ dev.off()
 ## Select file name:
 file_name <- "Fig2b_survival_plots.pdf"
 
+setwd(workingDir_Figures)
 pdf(file_name, width=8,height=5)
 par(mfrow=c(1,2), oma=c(4,1,1,1), mar=c(5,4,2,1))
 plot(dat[,c(1,2)], type="o", bty="l", xlab="Age", ylab="Annual mortality", las=1, bg=colMTN3, cex.lab=0.8, cex.axis=0.8, ylim=c(0,1), cex=0.8, cex.lab=0.8, font.lab=2, pch=24)
@@ -109,6 +112,7 @@ dev.off()
 ## Select file name:
 file_name <- "Fig4_extn_risk_LM.pdf"
 
+setwd(workingDir_Figures)
 pdf(file_name, width=6,height=6)
 plot.new()
 par(mfrow=c(1,1), oma=c(4,1,1,1), mar=c(5,4,2,1))
@@ -131,6 +135,7 @@ dev.off()
 ## Select file name:
 file_name <- "Fig4_extn_risk_IBM.pdf"
 
+setwd(workingDir_Figures)
 pdf(file_name, width=6,height=6)
 plot.new()
 par(mfrow=c(1,1), oma=c(4,1,1,1), mar=c(5,4,2,1))
@@ -161,10 +166,10 @@ file_name <- "FigS1_LM_Projections_MTN3.pdf"
 ##file_name <- "FigS1_LM_Projections_WLG.pdf"
 
 ## Select exticntion risk files:
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_MTN_3%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_MTN_2%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_MTN_1%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_WLG.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_mtn_3%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_mtn_2%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_mtn_1%.csv")
+##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_wlg.csv")
 
 ## Select the correct folder for either WLG or MTN data
 workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_mtn_3%/")
@@ -183,7 +188,7 @@ for (i in 1:length(allScenarioFiles)){
 stochObjects <- c("LM_Stoch_Scenario1.csv","LM_Stoch_Scenario2.csv","LM_Stoch_Scenario3.csv","LM_Stoch_Scenario4.csv","LM_Stoch_Scenario5.csv","LM_Stoch_Scenario6.csv","LM_Stoch_Scenario7.csv","LM_Stoch_Scenario8.csv","LM_Stoch_Scenario9.csv")
 detObjects <- c("LM_Det_Scenario1.csv","LM_Det_Scenario2.csv","LM_Det_Scenario3.csv","LM_Det_Scenario4.csv", "LM_Det_Scenario5.csv","LM_Det_Scenario6.csv","LM_Det_Scenario7.csv","LM_Det_Scenario8.csv","LM_Det_Scenario9.csv")
 
-setwd(workingDir)
+setwd(workingDir_Figures)
 pdf(file_name, width=10,height=10)
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
@@ -211,6 +216,7 @@ dev.off()
 ######### IBM PROJECTION PLOTS #########
 ########################################
 
+setwd(workingDir_Output)
 ## Select file name:
 file_name <- "FigS2_IBM_Projections_MTN3.pdf"
 ##file_name <- "FigS2_IBM_Projections_MTN2.pdf"
@@ -219,30 +225,30 @@ file_name <- "FigS2_IBM_Projections_MTN3.pdf"
 
 
 ## Select exticntion risk files:
-probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_3%.csv")
-##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_2%.csv")
-##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_MTN_1%.csv")
-##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/extn_ibm_WLG.csv")
+probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/Results/Results_IBM_mtn_3%.csv")
+##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/Results/Results_IBM_mtn_2%.csv")
+##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/Results/Results_IBM_mtn_1%.csv")
+##probExt_ibm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/Results/Results_IBM_wlg_0.42.csv")
 
 ## Select the correct folder for either WLG or MTN data
-workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.99/")
-##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.85/")
-##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_mtn_0.65/")
-##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_IBM_50year_wlg_0.42/")
+workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/IBM_Projection_50year_mtn_3%")
+##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/IBM_Projection_50year_mtn_2%")
+##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/IBM_Projection_50year_mtn_1%")
+##workingDir_IBM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/IBM_Projection_50year_wlg_0.42")
 
 setwd(workingDir_IBM)
 allScenarioFiles <- list.files(pattern="*.csv")
 
 for (i in 1:length(allScenarioFiles)){
   assign(allScenarioFiles[i], 
-         read.csv(paste(workingDir_IBM, allScenarioFiles[i], sep=''), header=TRUE)
+         read.csv(allScenarioFiles[i], header=TRUE)
   )}
 
 stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
 
 timeunit <- 1/12 ## time interval for the plots
 
-setwd(workingDir)
+setwd(workingDir_Figures)
 pdf(file_name, width=10,height=10) 
 par(mfrow=c(3,3), oma=c(0,0,0,0), mar=c(5,4,2,1), las=1, bty="l")
 maxY <- 120 ## max y-axis value
@@ -274,11 +280,11 @@ dev.off()
 ########################################
 ######## FINAL POPULATION SIZES ########
 ########################################
-setwd(workingDir)
 
 ## Select file name:
 file_name <- "Fig5_FinalPopSize_IBM.pdf"
 
+setwd(workingDir_Figures)
 pdf(file_name, width=8,height=8)
 par(mfrow=c(2,2))
 boxplot(finalPop1$A, finalPop1$B, finalPop1$C, finalPop1$D, finalPop1$E, finalPop1$F, finalPop1$G, finalPop1$H, finalPop1$I, pch=24, col=colMTN3, bg=colMTN3, ylim=c(0,300), varwidth=FALSE)
@@ -295,14 +301,14 @@ axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size 
 axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 
-boxplot(finalPop3$A, finalPop3$B, finalPop3$C, finalPop3$D, finalPop3$E, finalPop3$F, finalPop3$G, finalPop3$H, finalPop3$I, pch=22, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+boxplot(finalPop3$A, finalPop3$B, finalPop3$C, finalPop3$D, finalPop3$E, finalPop3$F, finalPop3$G, finalPop3$H, finalPop3$I, pch=22, col=colMTN1, bg=colMTN1, ylim=c(0,300), varwidth=FALSE)
 lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
 par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
 axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
 axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 
-boxplot(finalPop4$A, finalPop4$B, finalPop4$C, finalPop4$D, finalPop4$E, finalPop4$F, finalPop4$G, finalPop4$H, finalPop4$I, pch=21, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+boxplot(finalPop4$A, finalPop4$B, finalPop4$C, finalPop4$D, finalPop4$E, finalPop4$F, finalPop4$G, finalPop4$H, finalPop4$I, pch=21, col=colWLG, bg=colWLG, ylim=c(0,300), varwidth=FALSE)
 lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
 par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
 axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
@@ -313,6 +319,7 @@ dev.off()
 ## Select file name:
 file_name <- "Fig5_FinalPopSize_LM.pdf"
 
+setwd(workingDir_Figures)
 pdf(file_name, width=8,height=8)
 par(mfrow=c(2,2))
 boxplot(finalPop5$A, finalPop5$B, finalPop5$C, finalPop5$D, finalPop5$E, finalPop5$F, finalPop5$G, finalPop5$H, finalPop5$I, pch=24, col=colMTN3, bg=colMTN3, ylim=c(0,300), varwidth=FALSE)
@@ -329,14 +336,14 @@ axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size 
 axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 
-boxplot(finalPop7$A, finalPop7$B, finalPop7$C, finalPop7$D, finalPop7$E, finalPop7$F, finalPop7$G, finalPop7$H, finalPop7$I, pch=22, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+boxplot(finalPop7$A, finalPop7$B, finalPop7$C, finalPop7$D, finalPop7$E, finalPop7$F, finalPop7$G, finalPop7$H, finalPop7$I, pch=22, col=colMTN1, bg=colMTN1, ylim=c(0,300), varwidth=FALSE)
 lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
 par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
 axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
 axis(1, LETTERS[1:9], at=1:9, labels=LETTERS[1:9])
 title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
 
-boxplot(finalPop8$A, finalPop8$B, finalPop8$C, finalPop8$D, finalPop8$E, finalPop8$F, finalPop8$G, finalPop8$H, finalPop8$I, pch=21, col=colMTN2, bg=colMTN2, ylim=c(0,300), varwidth=FALSE)
+boxplot(finalPop8$A, finalPop8$B, finalPop8$C, finalPop8$D, finalPop8$E, finalPop8$F, finalPop8$G, finalPop8$H, finalPop8$I, pch=21, col=colWLG, bg=colWLG, ylim=c(0,300), varwidth=FALSE)
 lines(x=c(-5:51), y=rep(50, 57), col="red", lwd=2, lty=2)
 par(new = TRUE, mar=c(5.1,4.1,4.1,5.1))
 axis(2, at=seq(0, 150, by=50), labels=seq(0, 150, by=50), ylab="Population size after 50 years", font.lab=2)
@@ -369,6 +376,7 @@ r_lm <- modelGeom$coef[2] ## take the slope of the line from this linear model f
 lambda_lm <- exp(modelGeom$coef[2]) ## lambda=0.9714966
 popEst_lm <- 35*(exp(r_lm))^(0:58)
 
+setwd(workingDir_Figures)
 pdf(file_name, width=5,height=5)
 ## plot the actual population sizes from census data and the expected population size:
 plot(year, N, xlab="Census Year", 
