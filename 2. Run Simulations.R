@@ -56,7 +56,11 @@ leslieMatrix(lifetable=dat[,c(1, 4:5)], filename="LeslieMatrix_WLG.csv")
 ############## Create an object that selects the LM ##############
 ##################################################################
 
+<<<<<<< Updated upstream
 selectLM <- read.csv("LeslieMatrix_WLG.csv")
+=======
+selectLM <- read.csv("LeslieMatrix_MTN_2%.csv")
+>>>>>>> Stashed changes
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
@@ -77,9 +81,15 @@ timeunit <- 1/12 ## timestep for IBM
 ## Initial demographic parameters: survivorship, fertility, and weaning age
 datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
+<<<<<<< Updated upstream
 weaningAge <- 4.5 ## 4.5 for WLG, 3.5 for MTN
 adultAge <- 10 ## 10 for WLG, 8 for MTN
 alpha <- 0.42 ## see "calculate_alpha_value.R" for more details
+=======
+weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
+adultAge <- 8 ## 10 for WLG, 8 for MTN
+alpha <- 0.40 ## see "calculate_alpha_value.R" for more details
+>>>>>>> Stashed changes
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
 initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
@@ -122,8 +132,8 @@ for(j in 1:(length(ReintroScenario)-1)){
 setwd(workingDir_Output)
 ## Select the correct folder:
 ##workingDir_LM <- "LM_Projection_50year_mtn_3%"
-##workingDir_LM <- "LM_Projection_50year_mtn_2%"
-workingDir_LM <- "LM_Projection_50year_mtn_1%"
+workingDir_LM <- "LM_Projection_50year_mtn_2%"
+##workingDir_LM <- "LM_Projection_50year_mtn_1%"
 ##workingDir_LM <- "LM_Projection_50year_wlg"
 
 setwd(workingDir_LM)
@@ -147,8 +157,8 @@ for(i in 1:length(allScenarioFiles)){
 setwd(workingDir_Output)
 ## Write csv files to save the results:
 ##write.csv(results_LM, file="Results/Results_LM_MTN_3%.csv", row.names=F)
-##write.csv(results_LM, file="Results/Results_LM_MTN_2%.csv", row.names=F)
-write.csv(results_LM, file="Results/Results_LM_MTN_1%.csv", row.names=F)
+write.csv(results_LM, file="Results/Results_LM_MTN_2%.csv", row.names=F)
+##write.csv(results_LM, file="Results/Results_LM_MTN_1%.csv", row.names=F)
 ##write.csv(results_LM, file="Results/Results_LM_WLG.csv", row.names=F)
 
 #####################################################################################
@@ -178,8 +188,13 @@ for(j in 1:length(initalConditions)){
 setwd(workingDir_Output)
 ## Select the correct folder:
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
+<<<<<<< Updated upstream
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
 workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
+=======
+workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
+>>>>>>> Stashed changes
 ##workingDir_IBM <- "IBM_Projection_50year_wlg"
 
 setwd(workingDir_IBM)
@@ -203,10 +218,17 @@ for(i in 1:length(allScenarioFiles)){
 
 setwd(workingDir_Output)
 ## Write csv files to save the results:
+<<<<<<< Updated upstream
 ##write.csv(results_IBM, file="Results/Results_ibm_MTN_3%.csv", row.names=F)
 ##write.csv(results_IBM, file="Results/Results_ibm_MTN_2%.csv", row.names=F)
 write.csv(results_IBM, file="Results/Results_ibm_MTN_1%.csv", row.names=F)
 #write.csv(results_IBM, file="Results/Results_ibm_WLG.csv", row.names=F)
+=======
+##write.csv(results_IBM, file="Results/extn_ibm_MTN_3%.csv", row.names=F)
+write.csv(results_IBM, file="Results/extn_ibm_MTN_2%.csv", row.names=F)
+##write.csv(results_IBM, file="Results/extn_ibm_MTN_1%.csv", row.names=F)
+#write.csv(results_IBM, file="Results/extn_ibm_WLG.csv", row.names=F)
+>>>>>>> Stashed changes
 
 ###############################################################################
 ################# CREATE CSV FILES FOR FINAL POPULATION SIZES #################
