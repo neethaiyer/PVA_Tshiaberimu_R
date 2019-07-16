@@ -56,11 +56,7 @@ leslieMatrix(lifetable=dat[,c(1, 4:5)], filename="LeslieMatrix_WLG.csv")
 ############## Create an object that selects the LM ##############
 ##################################################################
 
-<<<<<<< Updated upstream
 selectLM <- read.csv("LeslieMatrix_WLG.csv")
-=======
-selectLM <- read.csv("LeslieMatrix_MTN_2%.csv")
->>>>>>> Stashed changes
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
@@ -79,17 +75,11 @@ nruns <- 1000 ## Number of simulations to run
 timeunit <- 1/12 ## timestep for IBM
 
 ## Initial demographic parameters: survivorship, fertility, and weaning age
-datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
+datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
-<<<<<<< Updated upstream
-weaningAge <- 4.5 ## 4.5 for WLG, 3.5 for MTN
-adultAge <- 10 ## 10 for WLG, 8 for MTN
-alpha <- 0.42 ## see "calculate_alpha_value.R" for more details
-=======
 weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
 adultAge <- 8 ## 10 for WLG, 8 for MTN
 alpha <- 0.40 ## see "calculate_alpha_value.R" for more details
->>>>>>> Stashed changes
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
 initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
@@ -156,10 +146,10 @@ for(i in 1:length(allScenarioFiles)){
 
 setwd(workingDir_Output)
 ## Write csv files to save the results:
-##write.csv(results_LM, file="Results/Results_LM_MTN_3%.csv", row.names=F)
-write.csv(results_LM, file="Results/Results_LM_MTN_2%.csv", row.names=F)
-##write.csv(results_LM, file="Results/Results_LM_MTN_1%.csv", row.names=F)
-##write.csv(results_LM, file="Results/Results_LM_WLG.csv", row.names=F)
+##write.csv(results_LM, file="Results/Results_LM_mtn_3%.csv", row.names=F)
+write.csv(results_LM, file="Results/Results_LM_mtn_2%.csv", row.names=F)
+##write.csv(results_LM, file="Results/Results_LM_mtn_1%.csv", row.names=F)
+##write.csv(results_LM, file="Results/Results_LM_wlg.csv", row.names=F)
 
 #####################################################################################
 ################ PART 2: Individual Based Model (IBM) (Complex PVA) #################
@@ -188,14 +178,11 @@ for(j in 1:length(initalConditions)){
 setwd(workingDir_Output)
 ## Select the correct folder:
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
-<<<<<<< Updated upstream
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
-workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
-=======
-workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
->>>>>>> Stashed changes
-##workingDir_IBM <- "IBM_Projection_50year_wlg"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
+workingDir_IBM <- "IBM_Projection_50year_wlg_0.42"
 
 setwd(workingDir_IBM)
 allScenarioFiles <- list.files(pattern="*.csv")
@@ -218,34 +205,27 @@ for(i in 1:length(allScenarioFiles)){
 
 setwd(workingDir_Output)
 ## Write csv files to save the results:
-<<<<<<< Updated upstream
-##write.csv(results_IBM, file="Results/Results_ibm_MTN_3%.csv", row.names=F)
-##write.csv(results_IBM, file="Results/Results_ibm_MTN_2%.csv", row.names=F)
-write.csv(results_IBM, file="Results/Results_ibm_MTN_1%.csv", row.names=F)
-#write.csv(results_IBM, file="Results/Results_ibm_WLG.csv", row.names=F)
-=======
-##write.csv(results_IBM, file="Results/extn_ibm_MTN_3%.csv", row.names=F)
-write.csv(results_IBM, file="Results/extn_ibm_MTN_2%.csv", row.names=F)
-##write.csv(results_IBM, file="Results/extn_ibm_MTN_1%.csv", row.names=F)
-#write.csv(results_IBM, file="Results/extn_ibm_WLG.csv", row.names=F)
->>>>>>> Stashed changes
+##write.csv(results_IBM, file="Results/Results_IBM_mtn_3%.csv", row.names=F)
+##write.csv(results_IBM, file="Results/Results_IBM_mtn_2%.csv", row.names=F)
+##write.csv(results_IBM, file="Results/Results_IBM_mtn_1%.csv", row.names=F)
+write.csv(results_IBM, file="Results/Results_IBM_wlg.csv", row.names=F)
 
 ###############################################################################
 ################# CREATE CSV FILES FOR FINAL POPULATION SIZES #################
 ###############################################################################
 setwd(workingDir_Output)
 ## Select the correct folder for either LM or IBM:
-workingDir_LM <- "LM_Projection_50year_mtn_3%"
+##workingDir_LM <- "LM_Projection_50year_mtn_3%"
 ##workingDir_LM <- "LM_Projection_50year_mtn_2%"
 ##workingDir_LM <- "LM_Projection_50year_mtn_1%"
 ##workingDir_LM <- "LM_Projection_50year_wlg"
-workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
+##workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
-##workingDir_IBM <- "IBM_Projection_50year_wlg"
+##workingDir_IBM <- "IBM_Projection_50year_wlg_0.42"
 
-setwd(workingDir_LM)
-##setwd(workingDir_IBM)
+##setwd(workingDir_LM)
+setwd(workingDir_IBM)
 
 allScenarioFiles <- list.files(pattern="*.csv")
 for (i in 1:length(allScenarioFiles)){
@@ -257,9 +237,10 @@ for (i in 1:length(allScenarioFiles)){
 ########## IMPORTANT !!!!!! #########
 ########## IMPORTANT !!!!!! #########
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
-stochObjects <- c("LM_Stoch_Scenario1.csv","LM_Stoch_Scenario2.csv","LM_Stoch_Scenario3.csv","LM_Stoch_Scenario4.csv","LM_Stoch_Scenario5.csv","LM_Stoch_Scenario6.csv","LM_Stoch_Scenario7.csv","LM_Stoch_Scenario8.csv","LM_Stoch_Scenario9.csv")
-##stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
+##stochObjects <- c("LM_Stoch_Scenario1.csv","LM_Stoch_Scenario2.csv","LM_Stoch_Scenario3.csv","LM_Stoch_Scenario4.csv","LM_Stoch_Scenario5.csv","LM_Stoch_Scenario6.csv","LM_Stoch_Scenario7.csv","LM_Stoch_Scenario8.csv","LM_Stoch_Scenario9.csv")
+stochObjects <- c("IBM_Scenario1.csv","IBM_Scenario2.csv","IBM_Scenario3.csv","IBM_Scenario4.csv","IBM_Scenario5.csv","IBM_Scenario6.csv","IBM_Scenario7.csv","IBM_Scenario8.csv","IBM_Scenario9.csv")
 
+nruns <- 1000
 Nfinal <- data.frame(matrix(ncol=length(stochObjects), nrow=nruns))
 colnames(Nfinal) <- LETTERS[1:length(stochObjects)]
 
@@ -270,14 +251,15 @@ for(j in 1:length(stochObjects)){
   Nfinal[,j] <- as.numeric(resX[nrow(resX),])
 }
 
-##write.csv(Nfinal, file="Results_LM_Nfinal_MTN_3%.csv", row.names=F)
-##write.csv(Nfinal, file="Results_LM_Nfinal_MTN_2%.csv", row.names=F)
-##write.csv(Nfinal, file="Results_LM_Nfinal_MTN_1%.csv", row.names=F)
-##write.csv(Nfinal, file="Results_LM_Nfinal_WLG.csv", row.names=F)
-##write.csv(Nfinal, file="Results_IBM_Nfinal_MTN_3%.csv", row.names=F)
-##write.csv(Nfinal, file="Results_IBM_Nfinal_MTN_2%.csv", row.names=F)
-##write.csv(Nfinal, file="Results_IBM_Nfinal_MTN_1%.csv", row.names=F)
-##write.csv(Nfinal, file="Results_IBM_Nfinal_WLG.csv", row.names=F)
+setwd(workingDir_Output)
+##write.csv(Nfinal, file="Results/Results_LM_Nfinal_mtn_3%.csv", row.names=F)
+##write.csv(Nfinal, file="Results/Results_LM_Nfinal_mtn_2%.csv", row.names=F)
+##write.csv(Nfinal, file="Results/Results_LM_Nfinal_mtn_1%.csv", row.names=F)
+##write.csv(Nfinal, file="Results/Results_LM_Nfinal_wlg.csv", row.names=F)
+##write.csv(Nfinal, file="Results/Results_IBM_Nfinal_mtn_3%.csv", row.names=F)
+##write.csv(Nfinal, file="Results/Results_IBM_Nfinal_mtn_2%.csv", row.names=F)
+##write.csv(Nfinal, file="Results/Results_IBM_Nfinal_mtn_1%.csv", row.names=F)
+##write.csv(Nfinal, file="Results/Results_IBM_Nfinal_wlg.csv", row.names=F)
 
 ###############################################################################
 ################### CALCULATE GROWTH RATE R FOR EACH MODEL ####################
@@ -306,9 +288,9 @@ for (i in 1:length(allScenarioFiles)){
 ########## IMPORTANT !!!!!! #########
 ########## IMPORTANT !!!!!! #########
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
-finalPopObjects <- c("Results_LM_Nfinal_MTN_3%.csv","Results_LM_Nfinal_MTN_2%.csv","Results_LM_Nfinal_MTN_1%.csv","Results_LM_Nfinal_WLG.csv","Results_IBM_Nfinal_MTN_3%.csv","Results_IBM_Nfinal_MTN_2%.csv","Results_IBM_Nfinal_MTN_2%.csv","Results_LM_Nfinal_WLG.csv")
+finalPopObjects <- c("Results_LM_Nfinal_mtn_3%.csv","Results_LM_Nfinal_mtn_2%.csv","Results_LM_Nfinal_mtn_1%.csv","Results_LM_Nfinal_wlg.csv","Results_IBM_Nfinal_mtn_3%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_LM_Nfinal_wlg.csv")
 
-startingPopObjects <- c("Results_LM_N40_WLG.csv")
+startingPopObjects <- c("Results_LM_N40_wlg.csv")
 
 ## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
 growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]), 

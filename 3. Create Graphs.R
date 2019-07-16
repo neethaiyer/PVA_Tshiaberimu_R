@@ -1,7 +1,8 @@
 ## Set the working directory:
-workingDir <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/"
+workingDir <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R"
 setwd(workingDir)
-workingDir_Results <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/"
+workingDir_Results <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/Results"
+workingDir_Input <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Input"
 ##workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
 ## Let's pick our colors for MTN and WLG and include a transparency factor; note that these are only used for the bargraph below:
@@ -22,7 +23,7 @@ colWLG <- "#FF7F50"
 ##plot(rep(1,4), col=c(colMTN3,colMTN2,colMTN1,colWLG), pch=19 ,cex=3)
 
 ## Read all csv files:
-dat <- read.csv(paste0(workingDir, "Gorilla_LifeTables.csv")) ## life tables
+dat <- read.csv(paste0(workingDir_Input, "Gorilla_LifeTables.csv")) ## life tables
 ## probability of extinctions based on LM projections
 wlg_lm <- read.csv(paste0(workingDir_Results,"Results_LM_WLG.csv"))
 mtn_3per_lm <- read.csv(paste0(workingDir_Results,"Results_LM_MTN_3%.csv"))
