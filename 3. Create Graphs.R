@@ -283,7 +283,7 @@ dev.off()
 ########################################
 
 ## Select file name:
-file_name <- "Fig5_FinalPopSize_IBM.pdf"
+file_name <- "Fig5_FinalPopSize_LM.pdf"
 
 setwd(workingDir_Figures)
 pdf(file_name, width=8,height=8)
@@ -318,7 +318,7 @@ title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", fon
 dev.off()
 
 ## Select file name:
-file_name <- "Fig5_FinalPopSize_LM.pdf"
+file_name <- "Fig5_FinalPopSize_IBM.pdf"
 
 setwd(workingDir_Figures)
 pdf(file_name, width=8,height=8)
