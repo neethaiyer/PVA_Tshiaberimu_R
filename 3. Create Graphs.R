@@ -165,24 +165,25 @@ file_name <- "FigS1_LM_Projections_MTN3.pdf"
 ##file_name <- "FigS1_LM_Projections_MTN1.pdf"
 ##file_name <- "FigS1_LM_Projections_WLG.pdf"
 
+setwd(workingDir_Output)
 ## Select exticntion risk files:
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_mtn_3%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_mtn_2%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_mtn_1%.csv")
-##probExt_lm <- read.csv("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/pva_extn_results/Results_LM_wlg.csv")
+##probExt_lm <- read.csv("Results/Results_LM_mtn_3%.csv")
+##probExt_lm <- read.csv("Results/Results_LM_mtn_2%.csv")
+##probExt_lm <- read.csv("Results/Results_LM_mtn_1%.csv")
+##probExt_lm <- read.csv("Results/Results_LM_wlg.csv")
 
 ## Select the correct folder for either WLG or MTN data
-workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_mtn_3%/")
-##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_mtn_2%/")
-##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_mtn_1%/")
-##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/LM_Projection_50year_wlg/")
+workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/LM_Projection_50year_mtn_3%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/LM_Projection_50year_mtn_2%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/LM_Projection_50year_mtn_1%/")
+##workingDir_LM <- ("/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/LM_Projection_50year_wlg/")
 
 setwd(workingDir_LM)
 allScenarioFiles <- list.files(pattern="*.csv")
 
 for (i in 1:length(allScenarioFiles)){
   assign(allScenarioFiles[i], 
-         read.csv(paste(workingDir_LM, allScenarioFiles[i], sep=''), header=TRUE)
+         read.csv(allScenarioFiles[i], header=TRUE)
   )}
 
 stochObjects <- c("LM_Stoch_Scenario1.csv","LM_Stoch_Scenario2.csv","LM_Stoch_Scenario3.csv","LM_Stoch_Scenario4.csv","LM_Stoch_Scenario5.csv","LM_Stoch_Scenario6.csv","LM_Stoch_Scenario7.csv","LM_Stoch_Scenario8.csv","LM_Stoch_Scenario9.csv")
