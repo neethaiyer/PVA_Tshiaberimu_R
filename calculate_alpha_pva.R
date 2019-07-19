@@ -64,10 +64,10 @@ weaningAge <- 4.5 ## 4.5 for WLG, 3.5 for MTN
 adultAge <- 10 ## 10 for WLG, 8 for MTN
 
 temp <- pop_projection(tfinal=nyears, LM=mat, No=ReintroScenario[,11]) ## run the LM projection
-Nfinal <- data.frame(ReintroScenario$age, temp[,51])
+Nfinal <- data.frame(ReintroScenario$age, temp[,ncol(temp)])
 colnames(Nfinal) <- c("age","N")
 sum(Nfinal$N) ## check if Nfinal is about the same as Nfinal_expected for the required lambda value
-Nfinal_expected <- 1.032^50*30 ## Nfinal_expected = lambda^t*No (lambda for 3% = 1.032)
+Nfinal_expected <- 1.032^nyears*30 ## Nfinal_expected = lambda^t*No (lambda for 3% = 1.032)
 N_random <- rep(Nfinal$age, round(Nfinal$N)) ## create vector with individuals and their ages
 N_random <- sample(N_random, size=100, replace = FALSE, prob = NULL) ## randomly sample 100 individuals in each age class
 N_random <- data.frame(subset(N_random, N_random>weaningAge)) ## remove individuals younger than weaning age
@@ -80,7 +80,7 @@ growthRates <- data.frame(alpha_value = NA,
 timeunit<-1/12
 initalConditions <- convertToList(scenario = N_random, adultAge=adultAge, weaningAge=weaningAge) ## define initial conditions based on ages of females randomly sampled earlier in N_random
 nruns <- 10
-alpha <- 0.10 ## set alpha value
+alpha <- 0.42 ## set alpha value
 
 res <- matrix(0, nrow=trunc(nyears/timeunit)+1, ncol=nruns)
 for(j in 1:length(initalConditions)){
@@ -98,7 +98,7 @@ startPop <- as.numeric(res[840,])
 
 logLambda <- mean((1/30)*log(finalPop/startPop)) ## nyears for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
 lambda <- exp(logLambda)
-growthRates[2,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
+growthRates[1,1:3] <- c(alpha, round(logLambda, digits=3), round(lambda, digits=3))
 growthRates <- growthRates[order(-growthRates$alpha_value),] 
 growthRates
 

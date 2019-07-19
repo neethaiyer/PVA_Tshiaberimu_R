@@ -75,11 +75,11 @@ nruns <- 1000 ## Number of simulations to run
 timeunit <- 1/12 ## timestep for IBM
 
 ## Initial demographic parameters: survivorship, fertility, and weaning age
-datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
+datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
-weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
-adultAge <- 8 ## 10 for WLG, 8 for MTN
-alpha <- 0.40 ## see "calculate_alpha_value.R" for more details
+weaningAge <- 4.5 ## 4.5 for WLG, 3.5 for MTN
+adultAge <- 10 ## 10 for WLG, 8 for MTN
+alpha <- 0.42 ## see "calculate_alpha_value.R" for more details
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
 initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
