@@ -185,7 +185,7 @@ simTshia <- function(ages0, status0, time0, nyears, timeunit, alpha, verbose=T){
       } ## If weaning, add new row to abmData
     }
     if(sum(newAbmData$status=="CD")>0) newAbmData$status[newAbmData$status=="CD"] <- "C"
-    if(nrow(newAbmData[newAbmData$status!="D",])==0) break ## if the adult female died, newAbmData should have 1 row with status D, and the juvenile gets weaned, so we keep the baby in the next time step. 
+    if(nrow(newAbmData[newAbmData$status!="D",])==0) break ## if the adult female died, newAbmData should have 1 row with status D, and the dependent infant dies too, so we break the loop and add nothing to abmDataLog. 
     abmDataLog <- rbind(abmDataLog, newAbmData[newAbmData$status!="D",]) ## if there are individuals that are not dead then add them to the newAbmData
   }
   return(abmDataLog)
