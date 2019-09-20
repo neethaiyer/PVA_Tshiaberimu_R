@@ -40,7 +40,7 @@ dat$fertilityrate_1percent <- dat[,3]*.643
 ############## Create an object that selects the LM ##############
 ##################################################################
 
-selectLM <- read.csv("LeslieMatrix_WLG.csv")
+selectLM <- read.csv("LeslieMatrix_MTN_3%.csv")
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
