@@ -40,14 +40,14 @@ dat$fertilityrate_1percent <- dat[,3]*.643
 ############## Create an object that selects the LM ##############
 ##################################################################
 
-selectLM <- read.csv("LeslieMatrix_MTN_3%.csv")
+selectLM <- read.csv("LeslieMatrix_WLG.csv")
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
 ###############################################################################
 
 ## Reintroduction Scenarios:
-ReintroScenario <- read.csv("ReintroductionScenarios_LM.csv") ## csv file with Reintroduction Scenarios for LM
+ReintroScenario <- read.csv("ReintroductionScenarios_LM_alpha.csv") ## csv file with Reintroduction Scenarios for LM
 
 ## Leslie Matrix parameters:
 mat <- as.matrix(selectLM) ## LM needs to be converted to matrix object!
@@ -63,11 +63,20 @@ datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)
 weaningAge <- 4.5 ## 4.5 for WLG, 3.5 for MTN
 adultAge <- 10 ## 10 for WLG, 8 for MTN
 
-temp <- pop_projection(tfinal=nyears, LM=mat, No=ReintroScenario[,11]) ## run the LM projection
-Nfinal <- data.frame(ReintroScenario$age, temp[,ncol(temp)])
+N <- pop_projection(tfinal=nyears, LM=mat, No=ReintroScenario[,11]) ## run the LM projection
+Nfinal <- data.frame(ReintroScenario$age, N[,ncol(N)])
 colnames(Nfinal) <- c("age","N")
 sum(Nfinal$N) ## check if Nfinal is about the same as Nfinal_expected for the required lambda value
-Nfinal_expected <- 1.032^nyears*30 ## Nfinal_expected = lambda^t*No (lambda for 3% = 1.032)
+Nfinal_total <- data.frame(c(0:100), apply(N,2,sum))
+colnames(Nfinal_total) <- c("year","N")
+lambdaPop <- Nfinal_total[2:101,2]/Nfinal_total[1:100,2]
+lambda <- mean(lambdaPop[50:100]) ## lambda is about 0.999 for western gorillas
+growthRate <- log(lambda) ## growth rate is about 0.001 for western gorillas
+
+##look at how lambda changes inititally and then stabilizes to asymptote after 40 years
+matplot(1:100, lambdaPop, type="o", pch=20, col=1, xlab="Years", ylab="Lambda", main="Lambda values for Western gorillas (No=100)")
+
+Nfinal_expected <- 0.99^nyears*100 ## Nfinal_expected = lambda^t*No (lambda for 3% = 1.032)
 N_random <- rep(Nfinal$age, round(Nfinal$N)) ## create vector with individuals and their ages
 N_random <- sample(N_random, size=100, replace = FALSE, prob = NULL) ## randomly sample 100 individuals in each age class
 N_random <- data.frame(subset(N_random, N_random>weaningAge)) ## remove individuals younger than weaning age
