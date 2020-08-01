@@ -14,6 +14,9 @@ workingDir_Input <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Input/"
 ## Select the working directory for output files:
 workingDir_Output <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/"
 
+## Select the working directory for result files:
+workingDir_Results <- "/Users/neethaiyer/Desktop/PVA_Tshiaberimu_R/PVA_Output/Results/"
+
 ## DAMIEN !!!!! Your wd: ## Make sure to update as above!
 ## workingDir <- "~/Documents/git repositories/PVA_Tshiaberimu_R/"
 
@@ -182,7 +185,7 @@ setwd(workingDir_Output)
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
-workingDir_IBM <- "IBM_Projection_50year_wlg_0.42"
+workingDir_IBM <- "IBM_Projection_50year_wlg"
 
 setwd(workingDir_IBM)
 allScenarioFiles <- list.files(pattern="*.csv")
@@ -222,7 +225,7 @@ setwd(workingDir_Output)
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
-##workingDir_IBM <- "IBM_Projection_50year_wlg_0.42"
+##workingDir_IBM <- "IBM_Projection_50year_wlg"
 
 ##setwd(workingDir_LM)
 setwd(workingDir_IBM)
@@ -266,17 +269,17 @@ setwd(workingDir_Output)
 ###############################################################################
 setwd(workingDir_Output)
 ## Select the correct folder for either LM or IBM:
-##workingDir_LM <- "LM_Projection_50year_mtn_3%"
-##workingDir_LM <- "LM_Projection_50year_mtn_2%"
-##workingDir_LM <- "LM_Projection_50year_mtn_1%"
+workingDir_LM <- "LM_Projection_50year_mtn_3%"
+workingDir_LM <- "LM_Projection_50year_mtn_2%"
+workingDir_LM <- "LM_Projection_50year_mtn_1%"
 workingDir_LM <- "LM_Projection_50year_wlg"
 workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
-##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
-##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
-##workingDir_IBM <- "IBM_Projection_50year_wlg"
+workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
+workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
+workingDir_IBM <- "IBM_Projection_50year_wlg"
 
-setwd(workingDir_LM)
-##setwd(workingDir_IBM)
+##setwd(workingDir_LM)
+setwd(workingDir_IBM)
 
 allScenarioFiles <- list.files(pattern="*.csv")
 for (i in 1:length(allScenarioFiles)){
@@ -288,9 +291,9 @@ for (i in 1:length(allScenarioFiles)){
 ########## IMPORTANT !!!!!! #########
 ########## IMPORTANT !!!!!! #########
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
-finalPopObjects <- c("Results_LM_Nfinal_mtn_3%.csv","Results_LM_Nfinal_mtn_2%.csv","Results_LM_Nfinal_mtn_1%.csv","Results_LM_Nfinal_wlg.csv","Results_IBM_Nfinal_mtn_3%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_LM_Nfinal_wlg.csv")
+finalPopObjects <- c("Results_LM_Nfinal_mtn_3%.csv","Results_LM_Nfinal_mtn_2%.csv","Results_LM_Nfinal_mtn_1%.csv","Results_LM_Nfinal_wlg.csv","Results_IBM_Nfinal_mtn_3%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_IBM_Nfinal_wlg.csv")
 
-startingPopObjects <- c("Results_LM_N40_wlg.csv")
+startingPopObjects <- c("Results_IBM_N40_wlg.csv")
 
 ## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
 growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]), 
@@ -298,7 +301,7 @@ growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]),
 index<-0
 for(j in 1:9){
   index <- index+1
-  finalPop <- get(finalPopObjects[8]) ## here, j indicates which csv file to read
+  finalPop <- get(finalPopObjects[j]) ## here, j indicates which csv file to read
   startPop <- get(startingPopObjects[1])
   logLambda <- mean((1/10)*log((finalPop[,j])/(startPop[,j]))) ## 50 years for the census time period, loglambda = 1/timeperiod*log(Ntfinal)/Nt0
   lambda <- exp(logLambda)
@@ -306,3 +309,8 @@ for(j in 1:9){
 }
 
 growthRates
+
+setwd(workingDir_Results)
+finalPop <- read.csv("Results_IBM_Nfinal_wlg.csv")
+startPop <- read.csv("Results_IBM_N40_wlg.csv")
+logLambda <- mean((1/10)*log((finalPop[,9])/(startPop[,9])))
