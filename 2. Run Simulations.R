@@ -40,10 +40,13 @@ setwd(workingDir_Input)
 
 ## Your life history tables should have at least 3 columns: age, mortality rate, and fertility rate:
 dat <- read.csv("Gorilla_LifeTables.csv")
-dat$fertilityrate_2percent <- dat[,3]*.786 
+dat$fertilityrate_2percent <- dat[,3]*.789 
 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.01 which corresponds to a 1% growth rate
 dat$fertilityrate_1percent <- dat[,3]*.643 
 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.02 which corresponds to a 2% growth rate
+
+## LM 2%: lambda = 1.020237, r = 0.02003452, multiply LM ferility column by k = 0.789
+## LM 1%: lambda = 1.010051, r = 0.01000077, multiply LM ferility column by k = 0.643
 
 ####################################################################################
 ################# OPTIONAL: CREATE CSV FILES with LESLIE MATRICES ##################
@@ -58,8 +61,8 @@ leslieMatrix(lifetable=dat[,c(1, 4:5)], filename="LeslieMatrix_WLG.csv")
 ##################################################################
 ############## Create an object that selects the LM ##############
 ##################################################################
-
-selectLM <- read.csv("LeslieMatrix_WLG.csv")
+setwd(workingDir_Input)
+selectLM <- read.csv("LeslieMatrix_MTN_1%.csv")
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
@@ -78,11 +81,14 @@ nruns <- 1000 ## Number of simulations to run
 timeunit <- 1/12 ## timestep for IBM
 
 ## Initial demographic parameters: survivorship, fertility, and weaning age
-datX <- dat[,c(1,4:5)] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
+datX <- dat[,1:3] ## Subset appropriate life history columns: dat[,c(1,4:5)] for WLG, dat[,1:3] for MTN
 ## NOTE: this subsetting is needed because columns for dat are specified in FUNCTIONS 8 and 9
-weaningAge <- 4.5 ## 4.5 for WLG, 3.5 for MTN
-adultAge <- 10 ## 10 for WLG, 8 for MTN
-alpha <- 0.42 ## see "calculate_alpha_value.R" for more details
+weaningAge <- 3.5 ## 4.5 for WLG, 3.5 for MTN
+adultAge <- 8 ## 10 for WLG, 8 for MTN
+alpha <- 0.43 ## see "calculate_alpha_value.R" for more details
+## alpha 0.64 for 3% growth
+## alpha 0.43 for 2% growth
+## alpha 0.32 for 1% growth
 
 ## Depending on the adult female age and weaning age, create a list with the starting conditions for each scenario of the IBM
 initalConditions <- convertToList(scenario = ReintroScenario_IBM, adultAge=adultAge, weaningAge=weaningAge)
@@ -181,8 +187,6 @@ for(j in 1:length(initalConditions)){
 setwd(workingDir_Output)
 ## Select the correct folder:
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_3%"
-##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
-##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_2%"
 ##workingDir_IBM <- "IBM_Projection_50year_mtn_1%"
 workingDir_IBM <- "IBM_Projection_50year_wlg"
@@ -293,7 +297,7 @@ for (i in 1:length(allScenarioFiles)){
 ## Select simulation objects from list. Uncommented depending on whether IBM or LM:
 finalPopObjects <- c("Results_LM_Nfinal_mtn_3%.csv","Results_LM_Nfinal_mtn_2%.csv","Results_LM_Nfinal_mtn_1%.csv","Results_LM_Nfinal_wlg.csv","Results_IBM_Nfinal_mtn_3%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_IBM_Nfinal_mtn_2%.csv","Results_IBM_Nfinal_wlg.csv")
 
-startingPopObjects <- c("Results_IBM_N40_wlg.csv")
+startingPopObjects <- c("Results_LM_Nfinal_mtn_3%.csv")
 
 ## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
 growthRates <- data.frame(scenario = as.factor(LETTERS[1:9]), 
@@ -311,6 +315,6 @@ for(j in 1:9){
 growthRates
 
 setwd(workingDir_Results)
-finalPop <- read.csv("Results_IBM_Nfinal_wlg.csv")
-startPop <- read.csv("Results_IBM_N40_wlg.csv")
+finalPop <- read.csv("Results_LM_Nfinal_mtn_3%.csv")
+startPop <- 
 logLambda <- mean((1/10)*log((finalPop[,9])/(startPop[,9])))
