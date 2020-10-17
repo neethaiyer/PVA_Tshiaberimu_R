@@ -40,9 +40,9 @@ setwd(workingDir_Input)
 
 ## Your life history tables should have at least 3 columns: age, mortality rate, and fertility rate:
 dat <- read.csv("Gorilla_LifeTables.csv")
-dat$fertilityrate_2percent <- dat[,3]*.789 
+dat$fertilityrate_MTN1 <- dat[,3]*.789 
 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.01 which corresponds to a 1% growth rate
-dat$fertilityrate_1percent <- dat[,3]*.643 
+dat$fertilityrate_MTN2 <- dat[,3]*.643 
 ## fertility rates multiplied by factor less than 1 to get eigen values of 1.02 which corresponds to a 2% growth rate
 
 ## LM 2%: lambda = 1.020237, r = 0.02003452, multiply LM ferility column by k = 0.789

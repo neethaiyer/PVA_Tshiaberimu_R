@@ -40,7 +40,7 @@ dat$fertilityrate_1percent <- dat[,3]*.643
 ############## Create an object that selects the LM ##############
 ##################################################################
 
-selectLM <- read.csv("LeslieMatrix_MTN_2%.csv")
+selectLM <- read.csv("LeslieMatrix_MTN_1%.csv")
 
 ###############################################################################
 ############## SET THE INITIAL CONDITIONS OF THE LM & IBM MODELS ##############
@@ -51,6 +51,11 @@ ReintroScenario <- read.csv("ReintroductionScenarios_LM_alpha.csv") ## csv file 
 
 ## Leslie Matrix parameters:
 mat <- as.matrix(selectLM) ## LM needs to be converted to matrix object!
+lambda <- Re(eigen(mat)$value[1]) ## can calulate via eigenvector of LM also
+growthRate <- log(lambda) 
+## LM WLG: lambda = 0.999, r = -0.001
+## LM 2%: lambda = 1.020237, r = 0.02003452, multiply LM ferility column by k = 0.789
+## LM 1%: lambda = 1.010051, r = 0.01000077, multiply LM ferility column by k = 0.643
 
 ## Time parameters:
 nyears <- 100 ## Projection Period
@@ -71,12 +76,7 @@ Nfinal_total <- data.frame(c(0:100), apply(N,2,sum))
 colnames(Nfinal_total) <- c("year","N")
 lambdaPop <- Nfinal_total[2:101,2]/Nfinal_total[1:100,2]
 lambda <- mean(lambdaPop[50:100]) ## lambda is about 0.999 for western gorillas
-lambda <- Re(eigen(mat)$value[1]) ## can calulate via eigenvector of LM also
-growthRate <- log(lambda) 
-## LM WLG: lambda = 0.999, r = -0.001
-## LM 2%: lambda = 1.020237, r = 0.02003452, multiply LM ferility column by k = 0.789
-## LM 1%: lambda = 1.010051, r = 0.01000077, multiply LM ferility column by k = 0.643
-
+## compare this lambda to the eigenvalue above
 
 ##look at how lambda changes inititally and then stabilizes to asymptote after 40 years
 matplot(1:100, lambdaPop, type="o", pch=20, col=1, xlab="Years", ylab="Lambda", main="Lambda values for Western gorillas (No=100)")

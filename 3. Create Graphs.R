@@ -33,8 +33,13 @@ colN50 <- "#de2d26"
 
 ##plot(rep(1,5), col=c(colMTN3,colMTN2,colMTN1,colWLG, colN50), pch=19 ,cex=3)
 
-## Read all csv files:
-dat <- read.csv(paste0(workingDir_Input, "Gorilla_LifeTables.csv")) ## life tables
+## Read all csv files. Your life history tables should have at least 3 columns: age, mortality rate, and fertility rate:
+dat <- read.csv(paste0(workingDir_Input, "Gorilla_LifeTables.csv"))
+dat$fertilityrate_MTN1 <- dat[,3]*.789 
+## fertility rates multiplied by factor less than 1 to get eigen values of 1.01 which corresponds to a 1% growth rate
+dat$fertilityrate_MTN2 <- dat[,3]*.643 
+## fertility rates multiplied by factor less than 1 to get eigen values of 1.02 which corresponds to a 2% growth rate
+
 ## probability of extinctions based on LM projections
 mtn_3per_lm <- read.csv(paste0(workingDir_Output,"Results/Results_LM_mtn_3%.csv"))
 mtn_2per_lm <- read.csv(paste0(workingDir_Output,"Results/Results_LM_mtn_2%.csv"))
@@ -64,10 +69,10 @@ finalPop7 <- read.csv(paste0(workingDir_Output,"Results/Results_IBM_Nfinal_mtn_1
 file_name <- "Fig1_HistoricalTshiaberimuPop.pdf"
 
 ## Take a look at the historical population trajectories using Tshiaberimu census data
-year <- c(1959,1986,1995,1996,2003,2004,2006,2007,2008,2009,2011,2012,2013,2016,2017,2020) ## census years
+year <- c(1959,1986,1995,1996,2003,2004,2006,2007,2008,2009,2011,2012,2013,2015,2017,2020) ## census years
 censusPeriod <- 1959:2020 ## vector for census period
 totalYears <- length(censusPeriod)-1
-N <- c(35,20,17,16,20,20,21,22,18,16,6,6,7,6,6,7) ## census data
+N <- c(35,20,17,16,20,20,21,22,18,16,6,6,7,6,6,6) ## census data
 
 ## let's look at the rate of change in this population
 ## lambda is the finite rate of increase of a population over one time step. r is the intrinsinc rate of growth. negative r values indicate a population in decline. lambda < 1 indicates a decline. the relationship between lambda and r : lambda = Nt+1  / Nt, r = ln(lambda), lambda = e^r
@@ -85,12 +90,14 @@ popEst_lm <- N[1]*(exp(r_lm))^(0:totalYears)
 setwd(workingDir_Figures)
 pdf(file_name, width=5,height=5)
 ## plot the actual population sizes from census data and the expected population size:
-plot(year, N, xlab="Census Year", 
-     ylab="Population Size", 
+plot(year, N, 
+     xlab="Census Year", ylab="Population Size", 
      pch=16, type="o",
-     ylim=c(0,50), 
-     xlim=c(censusPeriod[1],censusPeriod[length(censusPeriod)]), 
-     las=1, cex.main=0.8, cex.lab=0.8, cex.axis=0.8, font.lab=2)
+     ylim=c(0,40), 
+     cex.lab=0.8, cex.axis=0.8, font.lab=2, axes=FALSE)
+box(bty="l")
+axis(2, font.lab=2, at=seq(0, 50, by=10), labels=seq(0, 50, by=10), las=2)
+axis(1, font.lab=2, at=seq(censusPeriod[1]+1, censusPeriod[length(censusPeriod)]+1, by=10), labels=seq(censusPeriod[1]+1, censusPeriod[length(censusPeriod)]+1, by=10), las=1)
 lines(censusPeriod, popEst_lm, col=colN50, lty=2, lwd=2)
 dev.off()
 
@@ -125,16 +132,8 @@ setwd(workingDir_Figures)
 pdf(file_name, width=5,height=5)
 par(oma=c(4,1,1,1), mar=c(5,4,2,1))
 plot(dat[,1],n_mtnCS, bty="l", type="o", xlab="Age (years)", ylab="Cumulative survival rate", las=1, bg=colMTN3, cex.lab=0.8, cex.axis=0.8, ylim=c(0,1), cex=0.7, cex.lab=0.8, font.lab=2, pch=24)
-lines(dat[,1],n_wlgCS, type="o", cex=0.7, bty="l", bg=colWLG, ylim=c(0,1), pch=21)
-
 par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
-plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
-legend("bottom", legend=c("Mountain Gorilla", "Western Lowland Gorilla"),
-       pt.bg=c(colMTN3, colWLG), lty=c(1,1), cex=0.7, text.font=2, pch=c(24,21), xpd = TRUE, horiz = FALSE, inset = c(0, 0.05), bty = "y")
 dev.off()
-
-# xpd = TRUE: legend will go outside the plotting region 
-# inset = c(x,y): how to move the legend relative to the 'bottom' location
 
 #####################################################################################
 ######################### FIGURE 4: EXTINCTION RISK PLOTS  ##########################
@@ -148,28 +147,36 @@ pdf(file_name, width=8,height=4)
 layout(matrix(c(1,2,3,4,4,4), ncol=3, byrow=TRUE), heights=c(0.8,0.2))
 par(oma=c(1, 1, 1, 1), mar=c(4, 4, 2, 2))
 
-plot(mtn_1per_lm$extn_Risk, bg=colMTN1, type="b", pch=22, xlab=NA, ylab=NA, xlim=c(1,9), ylim=c(0,80), xaxt="n", yaxt = "n")
-lines(mtn_1per_ibm$scenario, mtn_1per_ibm$extn_Risk, bg=colMTN1, type="b", pch=22, lty=2)
-axis(1, 1:9, LETTERS[1:9])
-axis(2, font.lab=2, at=seq(0, 80, by=10), labels=seq(0, 80, by=10), las=2)
-title(main="Mountain gorilla, 1%", xlab="Reintroduction Scenario", ylab="Extinction Risk (%)", font.lab=2)
+plot(mtn_1per_lm$extn_Risk, bg=colMTN1, type="o", pch=21, xlab=NA, ylab=NA, xlim=c(1,9), ylim=c(0,50), xaxt="n", yaxt = "n", axes=FALSE)
+lines(mtn_1per_ibm$scenario, mtn_1per_ibm$extn_Risk, bg=colMTN1, type="b", pch=21, lty=2)
+box(bty="l")
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
+axis(2, font.lab=2, at=seq(0, 50, by=10), labels=seq(0, 50, by=10), las=2)
+title(main="Mountain gorilla, 1%", ylab="Extinction risk (%)", cex=0.8, cex.main=0.9, font.lab=2)
 
-plot(mtn_2per_lm$extn_Risk, bg=colMTN2, type="b", pch=23, xlab=NA, ylab=NA, xlim=c(1,9), ylim=c(0,80), xaxt="n", yaxt = "n")
+plot(mtn_2per_lm$extn_Risk, bg=colMTN2, type="o", pch=23, xlab=NA, ylab=NA, xlim=c(1,9), ylim=c(0,50), xaxt="n", yaxt = "n", axes=FALSE)
 lines(mtn_2per_ibm$scenario, mtn_2per_ibm$extn_Risk, bg=colMTN2, type="b", pch=23, lty=2)
-axis(1, 1:9, LETTERS[1:9])
-axis(2, font.lab=2, at=seq(0, 80, by=10), labels=seq(0, 80, by=10), las=2)
-title(main="Mountain gorilla, 2%", xlab="Reintroduction Scenario", ylab="Extinction Risk (%)", font.lab=2)
+box(bty="l")
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
+axis(2, font.lab=2, at=seq(0, 50, by=10), labels=seq(0, 50, by=10), las=2)
+title(main="Mountain gorilla, 2%", cex.main=0.9, font.lab=2)
 
-plot(mtn_3per_lm$extn_Risk, bg=colMTN3, type="b", pch=24, xlab=NA, ylab=NA, xlim=c(1,9), ylim=c(0,80), xaxt="n", yaxt = "n")
+plot(mtn_3per_lm$extn_Risk, bg=colMTN3, type="o", pch=24, xlab=NA, ylab=NA, xlim=c(1,9), ylim=c(0,50), xaxt="n", yaxt = "n", axes=FALSE)
 lines(mtn_3per_ibm$extn_Risk, bg=colMTN3, type="b", pch=24, lty=2)
-axis(1, 1:9, LETTERS[1:9])
-axis(2, font.lab=2, at=seq(0, 80, by=10), labels=seq(0, 80, by=10), las=2)
-title(main="Mountain gorilla, 3.2%", xlab="Reintroduction Scenario", ylab="Extinction Risk (%)", font.lab=2)
+box(bty="l")
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
+axis(2, font.lab=2, at=seq(0, 50, by=10), labels=seq(0, 50, by=10), las=2)
+title(main="Mountain gorilla, 3.2%", cex.main=0.9, font.lab=2)
 
-par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
-plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+mtext("Reintroduction Scenario", side=1, line=-6, outer=TRUE, cex=0.7, font=2)
+
+par(mai=c(0,0,0,0))
+plot.new()
 legend("bottom", legend=c("Leslie Matrix", "Individual-based Model"), lty=c(1,2), text.font=2, xpd = TRUE, horiz = FALSE, inset = c(0, 0.04), bty = "y")
 dev.off()
+
+# xpd = TRUE: legend will go outside the plotting region 
+# inset = c(x,y): how to move the legend relative to the 'bottom' location
 
 #####################################################################################
 ######################### FIGURE 5: FINAL POPULATION SIZES ##########################
@@ -180,47 +187,48 @@ file_name <- "Fig5_FinalPopSize_LM_IBM.pdf"
 setwd(workingDir_Figures)
 
 pdf(file_name, width=12, height=6)
-layout(matrix(c(1,2,3,4,5,6,7,7,7), ncol=3, byrow=TRUE), heights=c(0.4,0.4,0.2))
+layout(matrix(c(1,2,3,4,5,6,7,7,7), ncol=3, byrow=TRUE), heights=c(0.45,0.45,0.1))
 par(oma=c(1, 1, 1, 1), mar=c(4, 4, 2, 2))
 
-boxplot(finalPop3$A, finalPop3$B, finalPop3$C, finalPop3$D, finalPop3$E, finalPop3$F, finalPop3$G, finalPop3$H, finalPop3$I, names=LETTERS[1:9], pch=15, col=colMTN1, outcol=colMTN1_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=1, staplelty=0, ylim=c(0,220), yaxt = "n")
-axis(2, font.lab=2, at=seq(0, 220, by=50), labels=seq(0, 200, by=50), las=2)
-lines(x=c(-5:51), y=rep(50, 57), col=colN50, lwd=1, lty=1)
-title(main="Mountain gorilla, 1%", xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+t <- boxplot(finalPop3$A, finalPop3$B, finalPop3$C, finalPop3$D, finalPop3$E, finalPop3$F, finalPop3$G, finalPop3$H, finalPop3$I, names=LETTERS[1:9], pch=16, cex=1.2, col=colMTN1, outcol=colMTN1_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=1, staplelty=0, ylim=c(0,200), yaxt = "n", axes=FALSE)
+box(bty="l")
+axis(2, font.lab=2, at=seq(0, 200, by=50), labels=seq(0, 200, by=50), las=2)
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
+title(main="Mountain gorilla, 1%", font.lab=2)
 
-boxplot(finalPop2$A, finalPop2$B, finalPop2$C, finalPop2$D, finalPop2$E, finalPop2$F, finalPop2$G, finalPop2$H, finalPop2$I, names=LETTERS[1:9], pch=18, col=colMTN2, outcol=colMTN2_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=1, staplelty=0, ylim=c(0,220), yaxt = "n")
-axis(2, font.lab=2, at=seq(0, 220, by=50), labels=seq(0, 200, by=50), las=2)
-lines(x=c(-5:51), y=rep(50, 57), col=colN50, lwd=1, lty=1)
-title(main="Mountain gorilla, 2%", xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+t <- boxplot(finalPop2$A, finalPop2$B, finalPop2$C, finalPop2$D, finalPop2$E, finalPop2$F, finalPop2$G, finalPop2$H, finalPop2$I, names=LETTERS[1:9], pch=18, cex=1.2, col=colMTN2, outcol=colMTN2_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=1, staplelty=0, ylim=c(0,200), yaxt = "n", axes=FALSE)
+box(bty="l")
+axis(2, font.lab=2, at=seq(0, 200, by=50), labels=seq(0, 200, by=50), las=2)
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
+title(main="Mountain gorilla, 2%", font.lab=2)
 
-boxplot(finalPop1$A, finalPop1$B, finalPop1$C, finalPop1$D, finalPop1$E, finalPop1$F, finalPop1$G, finalPop1$H, finalPop1$I, names=LETTERS[1:9], pch=17, col=colMTN3, outcol=colMTN3_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=1, staplelty=0, ylim=c(0,220), yaxt = "n")
-axis(2, font.lab=2, at=seq(0, 220, by=50), labels=seq(0, 200, by=50), las=2)
-lines(x=c(-5:51), y=rep(50, 57), col=colN50, lwd=1, lty=1)
-title(main="Mountain gorilla, 3.2%", xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+t <- boxplot(finalPop1$A, finalPop1$B, finalPop1$C, finalPop1$D, finalPop1$E, finalPop1$F, finalPop1$G, finalPop1$H, finalPop1$I, names=LETTERS[1:9], pch=17, cex=1.2, col=colMTN3, outcol=colMTN3_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=1, staplelty=0, ylim=c(0,200), yaxt = "n", axes=FALSE)
+box(bty="l")
+axis(2, font.lab=2, at=seq(0, 200, by=50), labels=seq(0, 200, by=50), las=2)
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
+title(main="Mountain gorilla, 3.2%", font.lab=2)
 
+t <- boxplot(finalPop7$A, finalPop7$B, finalPop7$C, finalPop7$D, finalPop7$E, finalPop7$F, finalPop7$G, finalPop7$H, finalPop7$I, names=LETTERS[1:9], pch=16, cex=1.2, col=colMTN1, outcol=colMTN1_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=2, staplelty=0, ylim=c(0,200), yaxt = "n", axes=FALSE)
+box(bty="l")
+axis(2, font.lab=2, at=seq(0, 200, by=50), labels=seq(0, 200, by=50), las=2)
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
 
-##boxplot(finalPop4$A, finalPop4$B, finalPop4$C, finalPop4$D, finalPop4$E, finalPop4$F, finalPop4$G, finalPop4$H, finalPop4$I, names=LETTERS[1:9], pch=20, col=colWLG, outcol=colWLG_alpha, ylim=c(0,220), varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=1, staplelty=0)
-##lines(x=c(-5:51), y=rep(50, 57), col=colN50, lwd=1, lty=1)
-##title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+t <- boxplot(finalPop6$A, finalPop6$B, finalPop6$C, finalPop6$D, finalPop6$E, finalPop6$F, finalPop6$G, finalPop6$H, finalPop6$I, names=LETTERS[1:9], pch=18, cex=1.2, col=colMTN2, outcol=colMTN2_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=2, staplelty=0, ylim=c(0,200), yaxt = "n", axes=FALSE)
+box(bty="l")
+axis(2, font.lab=2, at=seq(0, 200, by=50), labels=seq(0, 200, by=50), las=2)
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
 
-boxplot(finalPop7$A, finalPop7$B, finalPop7$C, finalPop7$D, finalPop7$E, finalPop7$F, finalPop7$G, finalPop7$H, finalPop7$I, names=LETTERS[1:9], pch=15, col=colMTN1, outcol=colMTN1_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=2, staplelty=0, ylim=c(0,220), yaxt = "n")
-axis(2, font.lab=2, at=seq(0, 220, by=50), labels=seq(0, 200, by=50), las=2)
-lines(x=c(-5:51), y=rep(50, 57), col=colN50, lwd=1, lty=1)
-title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+t <- boxplot(finalPop5$A, finalPop5$B, finalPop5$C, finalPop5$D, finalPop5$E, finalPop5$F, finalPop5$G, finalPop5$H, finalPop5$I, names=LETTERS[1:9], pch=17, cex=1.2, col=colMTN3, outcol=colMTN3_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=2, staplelty=0, ylim=c(0,200), yaxt = "n", axes=FALSE)
+box(bty="l")
+axis(2, font.lab=2, at=seq(0, 200, by=50), labels=seq(0, 200, by=50), las=2)
+axis(1, font.lab=2, at=seq(1, 9, by=1), labels=LETTERS[1:9], las=1)
 
-boxplot(finalPop6$A, finalPop6$B, finalPop6$C, finalPop6$D, finalPop6$E, finalPop6$F, finalPop6$G, finalPop6$H, finalPop6$I, names=LETTERS[1:9], pch=18, col=colMTN2, outcol=colMTN2_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=2, staplelty=0, ylim=c(0,220), yaxt = "n")
-axis(2, font.lab=2, at=seq(0, 220, by=50), labels=seq(0, 200, by=50), las=2)
-lines(x=c(-5:51), y=rep(50, 57), col=colN50, lwd=1, lty=1)
-title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
-
-boxplot(finalPop5$A, finalPop5$B, finalPop5$C, finalPop5$D, finalPop5$E, finalPop5$F, finalPop5$G, finalPop5$H, finalPop5$I, names=LETTERS[1:9], pch=17, col=colMTN3, outcol=colMTN3_alpha, varwidth=FALSE, medlwd=1, medcol="white", boxlty=1, whisklty=2, staplelty=0, ylim=c(0,220), yaxt = "n")
-axis(2, font.lab=2, at=seq(0, 220, by=50), labels=seq(0, 200, by=50), las=2)
-lines(x=c(-5:51), y=rep(50, 57), col=colN50, lwd=1, lty=1)
-title(xlab="Reintroduction Scenario", ylab="Population size after 50 years", font.lab=2)
+mtext("Reintroduction Scenario", side=1, line=-5, outer=TRUE, cex=1, font=2)
+mtext("Population size after 50 years", side=2, line=-1, outer=TRUE, cex=1, font=2, las=0)
 
 par(mai=c(0,0,0,0))
 plot.new()
-legend("center", legend=c("Mountain Gorillas - 1%", "Mountain Gorillas - 2%", "Mountain Gorillas - 3.2%"), fill=c(colMTN1, colMTN2, colMTN3), text.font=2, cex=1, xpd = TRUE, horiz = FALSE)
+legend("bottom", legend=c("Leslie Matrix", "Individual-based Model"), lty=c(1,2), text.font=2, xpd = TRUE, horiz = FALSE, inset = c(0, 0.02), bty = "y")
 dev.off()
 
 file_name <- "Fig5_FinalPopSize_LM_IBM.pdf"
